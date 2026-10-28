@@ -1,0 +1,176 @@
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/plus-jakarta-sans';
+@import 'leaflet/dist/leaflet.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-ink-50 text-ink-900 font-sans;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+  h1, h2, h3 {
+    @apply font-display tracking-tight;
+  }
+  ::selection {
+    @apply bg-brand-200 text-brand-950;
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: theme('colors.ink.200') transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  *::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-ink-200;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    @apply bg-ink-300;
+  }
+}
+
+@layer components {
+  /* ---------- Boutons ---------- */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold
+      transition-all duration-150 select-none
+      focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2
+      disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.98];
+  }
+  .btn-primary {
+    @apply btn bg-gradient-to-b from-brand-500 to-brand-600 text-white shadow-[0_1px_0_rgba(255,255,255,0.18)_inset,0_6px_16px_-6px_rgba(79,70,229,0.7)]
+      hover:from-brand-500 hover:to-brand-700 hover:shadow-glow;
+  }
+  .btn-secondary {
+    @apply btn border border-ink-200 bg-white text-ink-700 shadow-soft hover:border-ink-300 hover:bg-ink-50;
+  }
+  .btn-ghost {
+    @apply btn text-ink-600 hover:bg-ink-100;
+  }
+  .btn-danger {
+    @apply btn bg-rose-600 text-white hover:bg-rose-700;
+  }
+  .btn-sm {
+    @apply px-3 py-1.5 text-xs;
+  }
+  .btn-icon {
+    @apply inline-flex h-9 w-9 items-center justify-center rounded-xl text-ink-500 transition-colors
+      hover:bg-ink-100 hover:text-ink-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500;
+  }
+
+  /* ---------- Champs ---------- */
+  .input {
+    @apply w-full rounded-xl border border-ink-200 bg-white px-3.5 py-2.5 text-sm text-ink-900 shadow-soft
+      placeholder:text-ink-400 transition
+      focus:border-brand-400 focus:outline-none focus:ring-4 focus:ring-brand-500/15
+      disabled:cursor-not-allowed disabled:bg-ink-50 disabled:text-ink-400;
+  }
+  .input-error {
+    @apply border-rose-300 focus:border-rose-400 focus:ring-rose-500/15;
+  }
+  .label {
+    @apply mb-1.5 block text-xs font-semibold uppercase tracking-wide text-ink-500;
+  }
+
+  /* ---------- Cartes ---------- */
+  .card {
+    @apply rounded-2xl border border-ink-100 bg-white p-6 shadow-card;
+  }
+  .card-hover {
+    @apply transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-lift;
+  }
+
+  /* ---------- Badges ---------- */
+  .badge {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset;
+  }
+
+  /* ---------- Tableaux ---------- */
+  .table-head {
+    @apply bg-ink-50/70 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-500;
+  }
+  .table-row {
+    @apply border-t border-ink-100 transition-colors hover:bg-brand-50/40;
+  }
+}
+
+/* ---------- Skeleton shimmer ---------- */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  @apply rounded-lg bg-ink-100;
+}
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+  animation: shimmer 1.6s infinite;
+}
+
+/* ---------- Grain / grille décorative ---------- */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+/* ---------- Leaflet ---------- */
+.leaflet-container {
+  font-family: inherit;
+  @apply rounded-2xl;
+}
+.leaflet-popup-content-wrapper {
+  @apply rounded-xl shadow-lift;
+}
+.leaflet-popup-content {
+  margin: 14px 16px;
+}
+.bt-pin {
+  background: transparent;
+  border: none;
+}
+.bt-pin > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background: linear-gradient(135deg, #6366f1, #4338ca);
+  border: 3px solid #fff;
+  box-shadow: 0 8px 18px -4px rgba(67, 56, 202, 0.6);
+  transition: transform 0.2s ease;
+}
+.bt-pin > div > span {
+  transform: rotate(45deg);
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+}
+.bt-pin.is-active > div {
+  background: linear-gradient(135deg, #10b981, #047857);
+  transform: rotate(-45deg) scale(1.2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

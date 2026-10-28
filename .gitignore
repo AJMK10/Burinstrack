@@ -1,0 +1,27 @@
+# Secrets
+.env
+*.env.local
+
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+logs/
+
+
+# Node
+node_modules/
+burintrack-web/dist/
+burintrack-web/.env
+burintrack-web/.env.local
+
+# Docker
+docker/nginx/certs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+

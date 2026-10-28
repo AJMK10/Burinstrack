@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
+    <PackageReference Include="StackExchange.Redis" Version="2.7.33" />
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0" />
+    <PackageReference Include="Minio" Version="6.0.2" />
+    <PackageReference Include="MailKit" Version="4.3.0" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="7.3.1" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.3.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BurinTrack.Application\BurinTrack.Application.csproj" />
+  </ItemGroup>
+</Project>
