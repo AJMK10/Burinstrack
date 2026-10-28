@@ -92,6 +92,58 @@ export interface Intervention {
   createdAt: string;
 }
 
+export interface ReleveCompteur {
+  id: string;
+  copieurId: string;
+  nomCopieur: string;
+  numeroSerie: string;
+  nomClient: string;
+  annee: number;
+  mois: number;
+  a3MonoDebut: number; a4MonoDebut: number; a3CoulDebut: number; a4CoulDebut: number;
+  a3MonoFin: number;   a4MonoFin: number;   a3CoulFin: number;   a4CoulFin: number;
+  copiesMonoA4Eq: number;
+  copiesCoulA4Eq: number;
+  createdAt: string;
+}
+
+export interface DetailCopieurFacture {
+  copieurId: string;
+  nomCopieur: string;
+  numeroSerie: string;
+  copiesMonoA4Eq: number;
+  copiesCoulA4Eq: number;
+}
+
+export interface FactureMensuelle {
+  clientId: string;
+  nomClient: string;
+  numeroContrat: string;
+  annee: number;
+  mois: number;
+  totalMonoA4Eq: number;
+  totalCoulA4Eq: number;
+  forfaitCopieMono: number;
+  forfaitCopieCouleur: number;
+  copiesSupMono: number;
+  copiesSupCouleur: number;
+  forfaitMensuelHT: number;
+  coutCopiesSupHT: number;
+  totalHT: number;
+  tauxTVA: number;
+  montantTVA: number;
+  totalTTC: number;
+  details: DetailCopieurFacture[];
+}
+
+export interface AppUser {
+  id: string;
+  email: string;
+  nomComplet: string;
+  role: string;
+  isLocked: boolean;
+}
+
 export interface Dashboard {
   totalClients: number;
   totalCopieurs: number;

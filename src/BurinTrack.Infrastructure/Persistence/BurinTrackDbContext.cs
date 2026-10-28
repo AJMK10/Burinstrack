@@ -15,6 +15,7 @@ public class BurinTrackDbContext : IdentityDbContext<IdentityUser>
     public DbSet<Intervention> Interventions => Set<Intervention>();
     public DbSet<Document> Documents => Set<Document>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<ReleveCompteur> Releves => Set<ReleveCompteur>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

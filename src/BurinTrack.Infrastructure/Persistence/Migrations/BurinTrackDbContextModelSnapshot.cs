@@ -108,6 +108,15 @@ namespace BurinTrack.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<long>("ForfaitCopieCouleur")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ForfaitCopieMono")
+                        .HasColumnType("bigint");
+
+                    b.Property<decimal>("ForfaitMensuelHT")
+                        .HasColumnType("numeric");
+
                     b.Property<double?>("Latitude")
                         .HasColumnType("double precision");
 
@@ -135,6 +144,12 @@ namespace BurinTrack.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(100)")
                         .HasDefaultValue("Gabon");
 
+                    b.Property<decimal>("PrixCopieSupCouleur")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal>("PrixCopieSupMono")
+                        .HasColumnType("numeric");
+
                     b.Property<string>("RaisonSociale")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -143,6 +158,9 @@ namespace BurinTrack.Infrastructure.Persistence.Migrations
                     b.Property<string>("SecteurActivite")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<decimal>("TauxTVA")
+                        .HasColumnType("numeric");
 
                     b.Property<string>("Telephone")
                         .IsRequired()
@@ -367,6 +385,59 @@ namespace BurinTrack.Infrastructure.Persistence.Migrations
                     b.HasIndex("TechnicienId");
 
                     b.ToTable("Interventions");
+                });
+
+            modelBuilder.Entity("BurinTrack.Domain.Entities.ReleveCompteur", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("A3CoulDebut")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("A3CoulFin")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("A3MonoDebut")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("A3MonoFin")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("A4CoulDebut")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("A4CoulFin")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("A4MonoDebut")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("A4MonoFin")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Annee")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("CopieurId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Mois")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CopieurId", "Annee", "Mois")
+                        .IsUnique();
+
+                    b.ToTable("Releves", (string)null);
                 });
 
             modelBuilder.Entity("BurinTrack.Domain.Entities.Technicien", b =>
@@ -654,6 +725,17 @@ namespace BurinTrack.Infrastructure.Persistence.Migrations
                     b.Navigation("Technicien");
                 });
 
+            modelBuilder.Entity("BurinTrack.Domain.Entities.ReleveCompteur", b =>
+                {
+                    b.HasOne("BurinTrack.Domain.Entities.Copieur", "Copieur")
+                        .WithMany("Releves")
+                        .HasForeignKey("CopieurId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Copieur");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -715,6 +797,8 @@ namespace BurinTrack.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("BurinTrack.Domain.Entities.Copieur", b =>
                 {
                     b.Navigation("Interventions");
+
+                    b.Navigation("Releves");
                 });
 
             modelBuilder.Entity("BurinTrack.Domain.Entities.Technicien", b =>

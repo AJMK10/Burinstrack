@@ -53,7 +53,13 @@ public class ClientsController : ControllerBase
             NomContact = dto.NomContact,
             FonctionContact = dto.FonctionContact,
             Telephone = dto.Telephone,
-            Email = dto.Email
+            Email = dto.Email,
+            ForfaitMensuelHT = dto.ForfaitMensuelHT,
+            ForfaitCopieMono = dto.ForfaitCopieMono,
+            ForfaitCopieCouleur = dto.ForfaitCopieCouleur,
+            PrixCopieSupMono = dto.PrixCopieSupMono,
+            PrixCopieSupCouleur = dto.PrixCopieSupCouleur,
+            TauxTVA = dto.TauxTVA
         };
 
         await _uow.Clients.AddAsync(client, ct);
@@ -82,6 +88,12 @@ public class ClientsController : ControllerBase
         client.Telephone = dto.Telephone;
         client.Email = dto.Email;
         client.EstActif = dto.EstActif;
+        client.ForfaitMensuelHT = dto.ForfaitMensuelHT;
+        client.ForfaitCopieMono = dto.ForfaitCopieMono;
+        client.ForfaitCopieCouleur = dto.ForfaitCopieCouleur;
+        client.PrixCopieSupMono = dto.PrixCopieSupMono;
+        client.PrixCopieSupCouleur = dto.PrixCopieSupCouleur;
+        client.TauxTVA = dto.TauxTVA;
 
         await _uow.Clients.UpdateAsync(client, ct);
         await _uow.SaveChangesAsync(ct);
@@ -105,5 +117,8 @@ public class ClientsController : ControllerBase
         c.Id, c.NomClient, c.RaisonSociale, c.NumeroContrat, c.SecteurActivite,
         c.Adresse, c.Ville, c.Commune, c.Pays, c.Latitude, c.Longitude,
         c.NomContact, c.FonctionContact, c.Telephone, c.Email,
-        c.EstActif, c.Copieurs.Count, c.CreatedAt);
+        c.EstActif,
+        c.ForfaitMensuelHT, c.ForfaitCopieMono, c.ForfaitCopieCouleur,
+        c.PrixCopieSupMono, c.PrixCopieSupCouleur, c.TauxTVA,
+        c.Copieurs.Count, c.CreatedAt);
 }

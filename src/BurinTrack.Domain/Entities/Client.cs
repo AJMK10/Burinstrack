@@ -25,6 +25,14 @@ public class Client : BaseEntity
 
     public bool EstActif { get; set; } = true;
 
+    // Facturation
+    public decimal ForfaitMensuelHT { get; set; } = 920000;
+    public long ForfaitCopieMono { get; set; } = 52000;
+    public long ForfaitCopieCouleur { get; set; } = 8000;
+    public decimal PrixCopieSupMono { get; set; } = 10;
+    public decimal PrixCopieSupCouleur { get; set; } = 50;
+    public decimal TauxTVA { get; set; } = 18;
+
     // Navigation
     public ICollection<Copieur> Copieurs { get; set; } = [];
     public ICollection<Document> Documents { get; set; } = [];

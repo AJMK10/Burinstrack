@@ -29,4 +29,5 @@ public class Copieur : BaseEntity
     // Navigation
     public Client Client { get; set; } = null!;
     public ICollection<Intervention> Interventions { get; set; } = [];
+    public ICollection<ReleveCompteur> Releves { get; set; } = [];
 }
