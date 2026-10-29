@@ -52,8 +52,26 @@ app.UseAuthorization();
 app.UseMiddleware<AuditMiddleware>();
 app.MapControllers();
 
-await DatabaseSeeder.SeedAsync(app.Services);
-if (app.Environment.IsDevelopment())
-    await DemoDataSeeder.SeedAsync(app.Services);
+// Seeder avec retry — tolère une base temporairement inaccessible au démarrage
+var seederLogger = app.Services.GetRequiredService<ILogger<Program>>();
+for (int attempt = 1; attempt <= 5; attempt++)
+{
+    try
+    {
+        await DatabaseSeeder.SeedAsync(app.Services);
+        if (app.Environment.IsDevelopment())
+            await DemoDataSeeder.SeedAsync(app.Services);
+        break;
+    }
+    catch (Exception ex) when (attempt < 5)
+    {
+        seederLogger.LogWarning(ex, "Seeder tentative {Attempt}/5 échouée, retry dans 5s", attempt);
+        await Task.Delay(TimeSpan.FromSeconds(5));
+    }
+    catch (Exception ex)
+    {
+        seederLogger.LogError(ex, "Seeder échoué après 5 tentatives — l'API démarre sans migration");
+    }
+}
 
 app.Run();

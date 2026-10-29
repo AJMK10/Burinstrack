@@ -1,4 +1,5 @@
 using BurinTrack.Domain.Common;
+using BurinTrack.Domain.Enums;
 
 namespace BurinTrack.Domain.Entities;
 
@@ -26,6 +27,7 @@ public class Client : BaseEntity
     public bool EstActif { get; set; } = true;
 
     // Facturation
+    public TypeFacturation TypeFacturation { get; set; } = TypeFacturation.Aucune;
     public decimal ForfaitMensuelHT { get; set; } = 920000;
     public long ForfaitCopieMono { get; set; } = 52000;
     public long ForfaitCopieCouleur { get; set; } = 8000;

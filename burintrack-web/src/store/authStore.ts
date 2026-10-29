@@ -27,11 +27,13 @@ export const useAuthStore = create<AuthState>()(
         set({ user, accessToken, refreshToken }),
       logout: () => {
         set({ user: null, accessToken: null, refreshToken: null });
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
       },
       hasRole: (role) => get().user?.roles.includes(role) ?? false,
     }),
-    { name: 'auth' }
+    {
+      name: 'auth',
+      // Ne persister que les infos utilisateur, jamais les tokens (XSS risk)
+      partialize: (state) => ({ user: state.user }),
+    }
   )
 );

@@ -33,7 +33,7 @@ export function AreaChart({
   data,
   labelA,
   labelB,
-  colorA = '#6366f1',
+  colorA = '#CC1416',
   colorB = '#f43f5e',
 }: {
   data: AreaDatum[];
@@ -71,10 +71,10 @@ export function AreaChart({
   const active = hover !== null ? data[hover] : null;
 
   return (
-    <div className="relative">
+    <div style={{ position: 'relative' }}>
       <svg
         viewBox={`0 0 ${W} ${H}`}
-        className="h-auto w-full"
+        style={{ width: '100%', height: 'auto' }}
         role="img"
         aria-label="Évolution mensuelle des interventions"
         onMouseLeave={() => setHover(null)}
@@ -102,7 +102,7 @@ export function AreaChart({
         <path d={areaA} fill={`url(#${uid}-a)`} />
         <path d={areaB} fill={`url(#${uid}-b)`} />
         <path d={lineA} fill="none" stroke={colorA} strokeWidth="3" strokeLinecap="round" />
-        <path d={lineB} fill="none" stroke={colorB} strokeWidth="2.5" strokeLinecap="round" strokeDasharray="1 0" />
+        <path d={lineB} fill="none" stroke={colorB} strokeWidth="2.5" strokeLinecap="round" />
 
         {hover !== null && (
           <line x1={x(hover)} x2={x(hover)} y1={padT} y2={baseY} stroke={colorA} strokeOpacity="0.25" strokeWidth="1.5" />
@@ -112,7 +112,7 @@ export function AreaChart({
           <g key={d.label}>
             <circle cx={x(i)} cy={y(d.a)} r={hover === i ? 6 : 4} fill="#fff" stroke={colorA} strokeWidth="2.5" />
             <circle cx={x(i)} cy={y(d.b)} r={hover === i ? 5 : 3} fill="#fff" stroke={colorB} strokeWidth="2" />
-            <text x={x(i)} y={H - 8} textAnchor="middle" fontSize="12" fontWeight={hover === i ? 700 : 500} fill={hover === i ? '#2e2a7f' : '#656b85'}>
+            <text x={x(i)} y={H - 8} textAnchor="middle" fontSize="12" fontWeight={hover === i ? 700 : 500} fill={hover === i ? colorA : '#656b85'}>
               {d.label}
             </text>
             <rect
@@ -130,18 +130,31 @@ export function AreaChart({
 
       {active && hover !== null && (
         <div
-          className="pointer-events-none absolute top-2 z-10 -translate-x-1/2 rounded-xl border border-ink-100 bg-white px-3 py-2 text-xs shadow-lift"
-          style={{ left: `${(x(hover) / W) * 100}%` }}
+          style={{
+            pointerEvents: 'none',
+            position: 'absolute',
+            top: 8,
+            left: `${(x(hover) / W) * 100}%`,
+            transform: 'translateX(-50%)',
+            zIndex: 10,
+            background: '#fff',
+            border: '1px solid #dee2e6',
+            borderRadius: '0.5rem',
+            padding: '0.5rem 0.75rem',
+            fontSize: '0.78rem',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            whiteSpace: 'nowrap',
+          }}
         >
-          <p className="mb-1 font-bold text-ink-900">{active.label}</p>
-          <p className="flex items-center gap-2 text-ink-600">
-            <span className="h-2 w-2 rounded-full" style={{ background: colorA }} />
-            {labelA} <strong className="ml-auto pl-3 text-ink-900">{active.a}</strong>
-          </p>
-          <p className="flex items-center gap-2 text-ink-600">
-            <span className="h-2 w-2 rounded-full" style={{ background: colorB }} />
-            {labelB} <strong className="ml-auto pl-3 text-ink-900">{active.b}</strong>
-          </p>
+          <div className="fw-bold mb-1" style={{ color: '#343a40' }}>{active.label}</div>
+          <div className="d-flex align-items-center gap-2 text-muted">
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: colorA, display: 'inline-block' }} />
+            {labelA} <strong className="ms-auto ps-2" style={{ color: '#343a40' }}>{active.a}</strong>
+          </div>
+          <div className="d-flex align-items-center gap-2 text-muted">
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: colorB, display: 'inline-block' }} />
+            {labelB} <strong className="ms-auto ps-2" style={{ color: '#343a40' }}>{active.b}</strong>
+          </div>
         </div>
       )}
     </div>
@@ -175,8 +188,8 @@ export function Donut({
 
   let offset = 0;
   return (
-    <div className="relative mx-auto" style={{ width: size, height: size }}>
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="-rotate-90">
+    <div style={{ position: 'relative', margin: '0 auto', width: size, height: size }}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ transform: 'rotate(-90deg)' }}>
         <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#eceef5" strokeWidth={thickness} />
         {total > 0 &&
           slices.map((s) => {
@@ -194,26 +207,38 @@ export function Donut({
                 strokeLinecap="round"
                 strokeDasharray={`${dash} ${c - dash}`}
                 strokeDashoffset={-offset}
-                className="transition-all duration-700"
+                style={{ transition: 'all 0.7s ease' }}
               />
             );
             offset += len;
             return s.value > 0 ? el : null;
           })}
       </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center text-center">{center}</div>
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          textAlign: 'center',
+        }}
+      >
+        {center}
+      </div>
     </div>
   );
 }
 
 export function Legend({ items }: { items: { label: string; value: number | string; color: string }[] }) {
   return (
-    <ul className="space-y-2">
+    <ul className="list-unstyled mb-0">
       {items.map((i) => (
-        <li key={i.label} className="flex items-center gap-2.5 text-sm">
-          <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: i.color }} />
-          <span className="text-ink-600">{i.label}</span>
-          <span className="ml-auto font-semibold tabular-nums text-ink-900">{i.value}</span>
+        <li key={i.label} className="d-flex align-items-center gap-2 mb-2" style={{ fontSize: '0.85rem' }}>
+          <span style={{ width: 10, height: 10, borderRadius: '50%', background: i.color, flexShrink: 0 }} />
+          <span className="text-muted">{i.label}</span>
+          <span className="ms-auto fw-semibold" style={{ color: '#343a40', fontVariantNumeric: 'tabular-nums' }}>{i.value}</span>
         </li>
       ))}
     </ul>
@@ -225,8 +250,8 @@ export function Legend({ items }: { items: { label: string; value: number | stri
 /* ------------------------------------------------------------------ */
 export function HBars({
   rows,
-  colorTotal = '#c7d2fe',
-  colorDone = '#6366f1',
+  colorTotal = '#fecaca',
+  colorDone  = '#CC1416',
 }: {
   rows: { label: string; total: number; done: number }[];
   colorTotal?: string;
@@ -234,23 +259,23 @@ export function HBars({
 }) {
   const max = Math.max(1, ...rows.map((r) => r.total));
   return (
-    <ul className="space-y-4">
+    <ul className="list-unstyled mb-0">
       {rows.map((r) => (
-        <li key={r.label}>
-          <div className="mb-1.5 flex items-baseline justify-between gap-2 text-sm">
-            <span className="truncate font-medium text-ink-800">{r.label}</span>
-            <span className="shrink-0 text-xs text-ink-500">
-              <strong className="text-ink-900">{r.done}</strong> / {r.total} résolues
+        <li key={r.label} className="mb-3">
+          <div className="d-flex align-items-baseline justify-content-between gap-2 mb-1" style={{ fontSize: '0.85rem' }}>
+            <span className="text-truncate fw-medium" style={{ color: '#343a40' }}>{r.label}</span>
+            <span className="flex-shrink-0 text-muted" style={{ fontSize: '0.75rem' }}>
+              <strong style={{ color: '#343a40' }}>{r.done}</strong> / {r.total} résolues
             </span>
           </div>
-          <div className="relative h-2.5 overflow-hidden rounded-full bg-ink-100">
+          <div style={{ position: 'relative', height: 10, borderRadius: '50rem', background: '#e9ecef', overflow: 'hidden' }}>
             <div
-              className="absolute inset-y-0 left-0 origin-left rounded-full animate-grow-x"
-              style={{ width: `${(r.total / max) * 100}%`, background: colorTotal }}
+              className="animate-grow-x"
+              style={{ position: 'absolute', inset: '0 auto 0 0', height: '100%', borderRadius: '50rem', width: `${(r.total / max) * 100}%`, background: colorTotal }}
             />
             <div
-              className="absolute inset-y-0 left-0 origin-left rounded-full animate-grow-x"
-              style={{ width: `${(r.done / max) * 100}%`, background: colorDone }}
+              className="animate-grow-x"
+              style={{ position: 'absolute', inset: '0 auto 0 0', height: '100%', borderRadius: '50rem', width: `${(r.done / max) * 100}%`, background: colorDone }}
             />
           </div>
         </li>
@@ -271,22 +296,24 @@ export function StackedBars({
 }) {
   const max = Math.max(1, ...rows.map((r) => r.a + r.b));
   return (
-    <ul className="space-y-3.5">
+    <ul className="list-unstyled mb-0">
       {rows.map((r) => (
-        <li key={r.label}>
-          <div className="mb-1.5 flex items-baseline justify-between gap-2 text-sm">
-            <span className="truncate font-medium text-ink-800">{r.label}</span>
-            <span className="shrink-0 text-xs font-semibold tabular-nums text-ink-600">{format(r.a + r.b)} pages</span>
+        <li key={r.label} className="mb-3">
+          <div className="d-flex align-items-baseline justify-content-between gap-2 mb-1" style={{ fontSize: '0.85rem' }}>
+            <span className="text-truncate fw-medium" style={{ color: '#343a40' }}>{r.label}</span>
+            <span className="flex-shrink-0 fw-semibold text-muted" style={{ fontSize: '0.75rem', fontVariantNumeric: 'tabular-nums' }}>
+              {format(r.a + r.b)} pages
+            </span>
           </div>
-          <div className="flex h-2.5 overflow-hidden rounded-full bg-ink-100" style={{ width: '100%' }}>
+          <div style={{ display: 'flex', height: 10, borderRadius: '50rem', background: '#e9ecef', overflow: 'hidden', width: '100%' }}>
             <div
-              className="h-full origin-left bg-ink-800 animate-grow-x"
-              style={{ width: `${(r.a / max) * 100}%` }}
+              className="animate-grow-x"
+              style={{ height: '100%', width: `${(r.a / max) * 100}%`, background: '#343a40' }}
               title={`Noir & blanc : ${format(r.a)}`}
             />
             <div
-              className="h-full origin-left bg-gradient-to-r from-brand-400 via-violet-400 to-rose-400 animate-grow-x"
-              style={{ width: `${(r.b / max) * 100}%` }}
+              className="animate-grow-x"
+              style={{ height: '100%', width: `${(r.b / max) * 100}%`, background: 'linear-gradient(90deg, #f59e0b, #8b5cf6, #f43f5e)' }}
               title={`Couleur : ${format(r.b)}`}
             />
           </div>
@@ -297,9 +324,9 @@ export function StackedBars({
 }
 
 /* ------------------------------------------------------------------ */
-/*  Mini courbe                                                        */
+/*  Mini courbe sparkline                                              */
 /* ------------------------------------------------------------------ */
-export function Sparkline({ values, color = '#6366f1' }: { values: number[]; color?: string }) {
+export function Sparkline({ values, color = '#CC1416' }: { values: number[]; color?: string }) {
   const uid = useId().replace(/:/g, '');
   if (values.length < 2) return null;
   const W = 120;
@@ -310,7 +337,7 @@ export function Sparkline({ values, color = '#6366f1' }: { values: number[]; col
   const pts: Pt[] = values.map((v, i) => [(i / (values.length - 1)) * W, H - 4 - ((v - min) / span) * (H - 8)]);
   const line = smoothPath(pts);
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="h-9 w-full" aria-hidden="true">
+    <svg viewBox={`0 0 ${W} ${H}`} style={{ height: 36, width: '100%' }} aria-hidden="true">
       <defs>
         <linearGradient id={uid} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor={color} stopOpacity="0.3" />

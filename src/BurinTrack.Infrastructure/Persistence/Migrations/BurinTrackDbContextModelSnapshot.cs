@@ -167,6 +167,9 @@ namespace BurinTrack.Infrastructure.Persistence.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("character varying(30)");
 
+                    b.Property<int>("TypeFacturation")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -385,6 +388,43 @@ namespace BurinTrack.Infrastructure.Persistence.Migrations
                     b.HasIndex("TechnicienId");
 
                     b.ToTable("Interventions");
+                });
+
+            modelBuilder.Entity("BurinTrack.Domain.Entities.Parametre", b =>
+                {
+                    b.Property<string>("Cle")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Valeur")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Cle");
+
+                    b.ToTable("Parametres");
+
+                    b.HasData(
+                        new
+                        {
+                            Cle = "entreprise",
+                            UpdatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Valeur = "{\"nomSociete\":\"BURINFORT\",\"adresse\":\"\",\"telephone\":\"\",\"email\":\"\",\"siteWeb\":\"\"}"
+                        },
+                        new
+                        {
+                            Cle = "smtp",
+                            UpdatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Valeur = "{\"hote\":\"\",\"port\":587,\"utilisateur\":\"\",\"motDePasse\":\"\",\"expediteur\":\"noreply@burinfort.com\",\"ssl\":true}"
+                        },
+                        new
+                        {
+                            Cle = "alertes",
+                            UpdatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Valeur = "{\"seuilJours1\":30,\"seuilJours2\":60,\"envoyerAutoAuDemarrage\":false}"
+                        });
                 });
 
             modelBuilder.Entity("BurinTrack.Domain.Entities.ReleveCompteur", b =>

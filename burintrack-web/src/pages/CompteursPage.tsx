@@ -4,11 +4,12 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
-  BookOpen, Calculator, Pencil, Plus, Printer, Trash2,
+  BookOpen, Calculator, ChevronDown, ChevronUp, Pencil, Plus, Printer, Trash2,
 } from 'lucide-react';
 import api from '../lib/api';
 import type { Client, Copieur, FactureMensuelle, ReleveCompteur } from '../types';
 import { errorMessage, formatNumber } from '../lib/format';
+import { printFacture } from '../lib/printFacture';
 import {
   Badge, EmptyState, ErrorState, Field, Modal, PageHeader, Spinner,
 } from '../components/ui';
@@ -73,6 +74,13 @@ export default function CompteursPage() {
     enabled: !!clientId && releves.length > 0,
   });
 
+  const { data: vitrine } = useQuery<{ logoBase64: string; nomSociete: string }>({
+    queryKey: ['vitrine'],
+    queryFn: () => api.get('/parametres/vitrine').then(r => r.data),
+    staleTime: 1000 * 60 * 10,
+    retry: false,
+  });
+
   const form = useForm<ReleveForm>({
     resolver: zodResolver(releveSchema),
     defaultValues: { copieurId: '', annee, mois, a3MonoDebut: 0, a4MonoDebut: 0, a3CoulDebut: 0, a4CoulDebut: 0, a3MonoFin: 0, a4MonoFin: 0, a3CoulFin: 0, a4CoulFin: 0 },
@@ -133,6 +141,7 @@ export default function CompteursPage() {
   );
 
   const selectedClient = clients.find(c => c.id === clientId);
+  const [showCalc, setShowCalc] = useState(false);
 
   return (
     <div>
@@ -274,14 +283,26 @@ export default function CompteursPage() {
           </div>
 
           {/* ── Récapitulatif facturation ── */}
-          {releves.length > 0 && (
+          {releves.length > 0 && selectedClient?.typeFacturation === 'Forfait' && (
             <div className="card border-0 shadow-sm animate-slide-up">
-              <div className="card-header d-flex align-items-center gap-2">
-                <Calculator size={15} className="text-brand" />
-                <span className="fw-semibold" style={{ fontSize: '0.875rem' }}>
-                  Facture estimée — {MOIS_LABELS[mois]} {annee}
-                  {selectedClient && <span className="text-muted ms-2" style={{ fontWeight: 400 }}>· {selectedClient.nomClient}</span>}
-                </span>
+              <div className="card-header d-flex align-items-center justify-content-between">
+                <div className="d-flex align-items-center gap-2">
+                  <Calculator size={15} className="text-brand" />
+                  <span className="fw-semibold" style={{ fontSize: '0.875rem' }}>
+                    Facture estimée — {MOIS_LABELS[mois]} {annee}
+                    {selectedClient && <span className="text-muted ms-2" style={{ fontWeight: 400 }}>· {selectedClient.nomClient}</span>}
+                  </span>
+                </div>
+                {facture && (
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1"
+                    onClick={() => printFacture(selectedClient!, releves, facture, copieurs, mois, annee, vitrine?.logoBase64, vitrine?.nomSociete)}
+                    title="Imprimer la facture"
+                  >
+                    <Printer size={13} /> Imprimer
+                  </button>
+                )}
               </div>
               <div className="card-body">
                 {loadingFacture ? (
@@ -358,6 +379,122 @@ export default function CompteursPage() {
                   </div>
                 ) : null}
               </div>
+            </div>
+          )}
+
+          {/* ── Méthode de calcul ── */}
+          {facture && selectedClient?.typeFacturation === 'Forfait' && (
+            <div className="card border-0 shadow-sm mt-3 animate-slide-up">
+              <button
+                className="card-header d-flex align-items-center justify-content-between w-100 text-start border-0 bg-transparent"
+                style={{ cursor: 'pointer' }}
+                onClick={() => setShowCalc(v => !v)}
+                type="button"
+              >
+                <div className="d-flex align-items-center gap-2">
+                  <Calculator size={15} className="text-muted" />
+                  <span className="fw-semibold" style={{ fontSize: '0.875rem' }}>Méthode de calcul</span>
+                </div>
+                {showCalc ? <ChevronUp size={15} className="text-muted" /> : <ChevronDown size={15} className="text-muted" />}
+              </button>
+              {showCalc && (
+                <div className="card-body" style={{ fontSize: '0.82rem' }}>
+                  {/* Étape 1 */}
+                  <div className="mb-4">
+                    <div className="fw-bold mb-2" style={{ color: '#495057', fontSize: '0.78rem', letterSpacing: '0.04em' }}>
+                      ÉTAPE 1 — CONVERSION EN ÉQUIVALENT A4
+                    </div>
+                    <div className="row g-2">
+                      <div className="col-sm-6">
+                        <div className="p-3 rounded-2" style={{ background: '#f8f9fa', border: '1px solid #e9ecef' }}>
+                          <div className="text-muted mb-1">Monochrome</div>
+                          <code style={{ fontSize: '0.8rem' }}>
+                            (A3 mono × 2) + A4 mono
+                          </code>
+                          <div className="mt-2 fw-bold">
+                            ({formatNumber(releves.reduce((s,r) => s + (r.a3MonoFin - r.a3MonoDebut), 0))} × 2) + {formatNumber(releves.reduce((s,r) => s + (r.a4MonoFin - r.a4MonoDebut), 0))} = <span style={{ color: '#343a40' }}>{formatNumber(facture.totalMonoA4Eq)}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-sm-6">
+                        <div className="p-3 rounded-2" style={{ background: '#fff8f8', border: '1px solid #fde8e8' }}>
+                          <div style={{ color: '#CC1416' }} className="mb-1">Couleur</div>
+                          <code style={{ fontSize: '0.8rem' }}>
+                            (A3 coul × 2) + A4 coul
+                          </code>
+                          <div className="mt-2 fw-bold">
+                            ({formatNumber(releves.reduce((s,r) => s + (r.a3CoulFin - r.a3CoulDebut), 0))} × 2) + {formatNumber(releves.reduce((s,r) => s + (r.a4CoulFin - r.a4CoulDebut), 0))} = <span style={{ color: '#CC1416' }}>{formatNumber(facture.totalCoulA4Eq)}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-muted mt-2" style={{ fontSize: '0.75rem' }}>1 copie A3 = 2 copies A4 (format double surface)</div>
+                  </div>
+
+                  {/* Étape 2 */}
+                  <div className="mb-4">
+                    <div className="fw-bold mb-2" style={{ color: '#495057', fontSize: '0.78rem', letterSpacing: '0.04em' }}>
+                      ÉTAPE 2 — COPIES SUPPLÉMENTAIRES
+                    </div>
+                    <div className="row g-2">
+                      <div className="col-sm-6">
+                        <div className="p-3 rounded-2" style={{ background: '#f8f9fa', border: '1px solid #e9ecef' }}>
+                          <code style={{ fontSize: '0.8rem' }}>max(0, Total − Forfait inclus)</code>
+                          <div className="mt-2">
+                            Mono : max(0, {formatNumber(facture.totalMonoA4Eq)} − {formatNumber(facture.forfaitCopieMono)}) = <strong style={{ color: facture.copiesSupMono > 0 ? '#f59e0b' : '#198754' }}>{formatNumber(facture.copiesSupMono)}</strong>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-sm-6">
+                        <div className="p-3 rounded-2" style={{ background: '#fff8f8', border: '1px solid #fde8e8' }}>
+                          <code style={{ fontSize: '0.8rem' }}>max(0, Total − Forfait inclus)</code>
+                          <div className="mt-2">
+                            Couleur : max(0, {formatNumber(facture.totalCoulA4Eq)} − {formatNumber(facture.forfaitCopieCouleur)}) = <strong style={{ color: facture.copiesSupCouleur > 0 ? '#f59e0b' : '#198754' }}>{formatNumber(facture.copiesSupCouleur)}</strong>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Étape 3 */}
+                  <div>
+                    <div className="fw-bold mb-2" style={{ color: '#495057', fontSize: '0.78rem', letterSpacing: '0.04em' }}>
+                      ÉTAPE 3 — CALCUL DU MONTANT
+                    </div>
+                    <div className="p-3 rounded-2" style={{ background: '#f8f9fa', border: '1px solid #e9ecef' }}>
+                      <div className="d-flex justify-content-between mb-2">
+                        <span className="text-muted">Forfait mensuel HT</span>
+                        <strong>{formatNumber(facture.forfaitMensuelHT)} FCFA</strong>
+                      </div>
+                      <div className="d-flex justify-content-between mb-2" style={{ color: '#6c757d', fontSize: '0.78rem' }}>
+                        <span>
+                          Copies sup Mono ({formatNumber(facture.copiesSupMono)} × {formatNumber(selectedClient.prixCopieSupMono)} FCFA)
+                        </span>
+                        <span>{formatNumber(facture.copiesSupMono * selectedClient.prixCopieSupMono)} FCFA</span>
+                      </div>
+                      <div className="d-flex justify-content-between mb-2" style={{ color: '#6c757d', fontSize: '0.78rem' }}>
+                        <span>
+                          Copies sup Couleur ({formatNumber(facture.copiesSupCouleur)} × {formatNumber(selectedClient.prixCopieSupCouleur)} FCFA)
+                        </span>
+                        <span>{formatNumber(facture.copiesSupCouleur * selectedClient.prixCopieSupCouleur)} FCFA</span>
+                      </div>
+                      <hr className="my-2" />
+                      <div className="d-flex justify-content-between fw-semibold mb-1">
+                        <span>Total HT</span>
+                        <span>{formatNumber(facture.totalHT)} FCFA</span>
+                      </div>
+                      <div className="d-flex justify-content-between" style={{ color: '#6c757d', fontSize: '0.78rem' }}>
+                        <span>TVA {facture.tauxTVA}% × {formatNumber(facture.totalHT)}</span>
+                        <span>{formatNumber(facture.montantTVA)} FCFA</span>
+                      </div>
+                      <div className="d-flex justify-content-between fw-bold mt-2 pt-2" style={{ borderTop: '2px solid #CC1416', color: '#CC1416', fontSize: '0.95rem' }}>
+                        <span>Total TTC</span>
+                        <span>{formatNumber(facture.totalTTC)} FCFA</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </>

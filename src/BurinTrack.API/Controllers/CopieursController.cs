@@ -103,6 +103,25 @@ public class CopieursController : ControllerBase
         return NoContent();
     }
 
+    [HttpPut("{id:guid}/attribuer")]
+    [Authorize(Policy = "CanManageClients")]
+    public async Task<IActionResult> Attribuer(Guid id, [FromBody] AttribuerCopieurDto dto, CancellationToken ct)
+    {
+        var copieur = await _db.Copieurs.FirstOrDefaultAsync(c => c.Id == id, ct);
+        if (copieur is null) return NotFound();
+
+        if (!await _db.Clients.AnyAsync(c => c.Id == dto.ClientId, ct))
+            return BadRequest("Client introuvable.");
+
+        copieur.ClientId = dto.ClientId;
+        copieur.DateDebutContrat = DateTime.SpecifyKind(dto.DateDebutContrat, DateTimeKind.Utc);
+        copieur.DateFinContrat = DateTime.SpecifyKind(dto.DateFinContrat, DateTimeKind.Utc);
+        copieur.StatutContrat = dto.StatutContrat;
+
+        await _db.SaveChangesAsync(ct);
+        return NoContent();
+    }
+
     private static CopieurDto MapToDto(Copieur c) => new(
         c.Id, c.ClientId, c.Client?.NomClient ?? "",
         c.Marque, c.Modele, c.Designation, c.NumeroSerie,

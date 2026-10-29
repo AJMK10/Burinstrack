@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using BurinTrack.Domain.Enums;
 
 namespace BurinTrack.Application.DTOs;
 
@@ -19,6 +20,7 @@ public record ClientDto(
     string Telephone,
     string Email,
     bool EstActif,
+    TypeFacturation TypeFacturation,
     decimal ForfaitMensuelHT,
     long ForfaitCopieMono,
     long ForfaitCopieCouleur,
@@ -49,7 +51,8 @@ public record CreateClientDto(
     [Range(0, long.MaxValue)] long ForfaitCopieCouleur = 8000,
     [Range(0, double.MaxValue)] decimal PrixCopieSupMono = 10,
     [Range(0, double.MaxValue)] decimal PrixCopieSupCouleur = 50,
-    [Range(0, 100)] decimal TauxTVA = 18
+    [Range(0, 100)] decimal TauxTVA = 18,
+    TypeFacturation TypeFacturation = TypeFacturation.Aucune
 );
 
 public record UpdateClientDto(
@@ -72,5 +75,6 @@ public record UpdateClientDto(
     [Range(0, long.MaxValue)] long ForfaitCopieCouleur = 8000,
     [Range(0, double.MaxValue)] decimal PrixCopieSupMono = 10,
     [Range(0, double.MaxValue)] decimal PrixCopieSupCouleur = 50,
-    [Range(0, 100)] decimal TauxTVA = 18
+    [Range(0, 100)] decimal TauxTVA = 18,
+    TypeFacturation TypeFacturation = TypeFacturation.Aucune
 );

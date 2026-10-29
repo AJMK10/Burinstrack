@@ -17,7 +17,7 @@ public class ClientRepository : Repository<Client>, IClientRepository
 
     public async Task<IEnumerable<Client>> SearchAsync(string? search, string? ville, CancellationToken ct = default)
     {
-        var query = _set.AsNoTracking().Where(c => c.EstActif);
+        var query = _set.AsNoTracking().Include(c => c.Copieurs).Where(c => c.EstActif);
 
         if (!string.IsNullOrWhiteSpace(search))
             query = query.Where(c =>

@@ -44,7 +44,7 @@ public class CompteursController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Policy = "CanManageClients")]
+    [Authorize(Policy = "CanManageReleves")]
     public async Task<ActionResult<ReleveCompteurDto>> Create([FromBody] CreateReleveDto dto, CancellationToken ct)
     {
         if (!await _db.Copieurs.AnyAsync(c => c.Id == dto.CopieurId, ct))
@@ -74,7 +74,7 @@ public class CompteursController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    [Authorize(Policy = "CanManageClients")]
+    [Authorize(Policy = "CanManageReleves")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateReleveDto dto, CancellationToken ct)
     {
         var releve = await _db.Releves.FirstOrDefaultAsync(r => r.Id == id, ct);
@@ -92,7 +92,7 @@ public class CompteursController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
-    [Authorize(Policy = "CanManageClients")]
+    [Authorize(Policy = "CanManageReleves")]
     public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
     {
         var releve = await _db.Releves.FirstOrDefaultAsync(r => r.Id == id, ct);

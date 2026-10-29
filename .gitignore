@@ -25,3 +25,6 @@ docker/nginx/certs/
 Thumbs.db
 
 
+
+# Script de dev local (credentials)
+start-dev.bat

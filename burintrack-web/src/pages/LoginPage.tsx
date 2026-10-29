@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import { useQuery } from '@tanstack/react-query';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { ArrowRight, Eye, EyeOff, Gauge, Lock, Mail, MapPin, ShieldCheck, Sparkles, Wrench } from 'lucide-react';
+import { Eye, EyeOff, Gauge, Lock, Mail, MapPin, Sparkles, Wrench } from 'lucide-react';
 import api from '../lib/api';
 import { useAuthStore } from '../store/authStore';
 import { errorMessage } from '../lib/format';
@@ -27,6 +28,16 @@ export default function LoginPage() {
   const setAuth = useAuthStore((s) => s.setAuth);
   const [error, setError] = useState<string | null>(null);
   const [showPwd, setShowPwd] = useState(false);
+
+  const { data: vitrine } = useQuery<{ imageDashboard: string; logoBase64: string; nomApplication: string; nomSociete: string }>({
+    queryKey: ['vitrine'],
+    queryFn: () => api.get('/parametres/vitrine').then((r) => r.data),
+    staleTime: 1000 * 60 * 10,
+    retry: false,
+  });
+  // image réelle uploadée (base64) → fond plein ; sinon → SVG illustratif sur dégradé bleu
+  const customImg = vitrine?.imageDashboard ?? '';
+  const hasPhoto  = customImg.startsWith('data:image');
 
   const {
     register,
@@ -57,124 +68,199 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="grid min-h-screen lg:grid-cols-[1.1fr_1fr]">
-      {/* ------------ Panneau de marque ------------ */}
-      <div className="relative hidden overflow-hidden bg-ink-950 text-white lg:block">
-        <div className="absolute inset-0 bg-gradient-to-br from-brand-900 via-brand-950 to-ink-950" />
-        <div className="bg-grid absolute inset-0 opacity-60 [mask-image:radial-gradient(ellipse_at_center,black,transparent_75%)]" />
-        <div className="absolute -left-20 top-10 h-96 w-96 rounded-full bg-brand-500/40 blur-3xl animate-float" />
-        <div className="absolute -bottom-24 right-0 h-[28rem] w-[28rem] rounded-full bg-violet-600/30 blur-3xl animate-float [animation-delay:-6s]" />
-        <div className="absolute right-24 top-1/3 h-48 w-48 rounded-full bg-sky-500/20 blur-3xl animate-float [animation-delay:-3s]" />
+    <div style={{ minHeight: '100vh', display: 'flex' }}>
+      {/* ---- Brand panel (desktop only) ---- */}
+      <div
+        className="d-none d-lg-flex flex-column justify-content-between"
+        style={{
+          flex: '1.1',
+          color: '#fff',
+          padding: '3rem',
+          position: 'relative',
+          overflow: 'hidden',
+          background: hasPhoto
+            ? 'transparent'
+            : 'linear-gradient(135deg, #1e3a5f 0%, #0f2640 50%, #0a1a2e 100%)',
+        }}
+      >
+        {/* Cas 1 : vraie photo uploadée → fond plein pleine largeur */}
+        {hasPhoto && (
+          <>
+            <img
+              src={customImg}
+              alt=""
+              aria-hidden
+              style={{
+                position: 'absolute', inset: 0,
+                width: '100%', height: '100%',
+                objectFit: 'cover', objectPosition: 'center',
+                pointerEvents: 'none', userSelect: 'none',
+              }}
+            />
+            <div style={{
+              position: 'absolute', inset: 0,
+              background: 'linear-gradient(135deg, rgba(10,18,40,0.82) 0%, rgba(15,30,60,0.75) 50%, rgba(8,16,35,0.7) 100%)',
+              pointerEvents: 'none',
+            }} />
+          </>
+        )}
 
-        <div className="relative flex h-full flex-col justify-between p-12 xl:p-16">
-          <div className="flex items-center gap-3">
-            <LogoMark size={44} />
-            <div className="leading-tight">
-              <p className="font-display text-xl font-extrabold tracking-tight">BurinTrack</p>
-              <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-brand-300">par BURINFORT</p>
+        {/* Cas 2 : dégradé bleu + illustration SVG copieur */}
+        {!hasPhoto && (
+          <>
+            <div style={{ position: 'absolute', top: '-6rem', left: '-6rem', width: '24rem', height: '24rem', borderRadius: '50%', background: 'rgba(59,125,221,0.25)', filter: 'blur(60px)' }} />
+            <div style={{ position: 'absolute', bottom: '-8rem', right: '-4rem', width: '28rem', height: '28rem', borderRadius: '50%', background: 'rgba(139,92,246,0.18)', filter: 'blur(80px)' }} />
+            <img
+              src="/copier-hero.svg"
+              alt=""
+              aria-hidden
+              style={{
+                position: 'absolute', bottom: 0, right: '-2rem',
+                width: '80%', maxHeight: '70%',
+                objectFit: 'contain', objectPosition: 'right bottom',
+                opacity: 0.45,
+                maskImage: 'linear-gradient(to top left, rgba(0,0,0,0.85) 30%, rgba(0,0,0,0.3) 65%, transparent 90%)',
+                WebkitMaskImage: 'linear-gradient(to top left, rgba(0,0,0,0.85) 30%, rgba(0,0,0,0.3) 65%, transparent 90%)',
+                pointerEvents: 'none', userSelect: 'none',
+              }}
+            />
+          </>
+        )}
+
+        <div className="d-flex align-items-center gap-3 position-relative">
+          <LogoMark size={44} />
+          <div>
+            <div style={{ fontWeight: 800, fontSize: '1.2rem', letterSpacing: '-0.02em' }}>BurinTrack</div>
+            <div style={{ fontSize: '0.65rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.18em', color: 'rgba(255,255,255,0.5)' }}>
+              par BURINFORT
             </div>
           </div>
-
-          <div className="max-w-xl animate-slide-up">
-            <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-xs font-semibold text-brand-200 backdrop-blur">
-              <Sparkles size={14} /> Plateforme SAV nouvelle génération
-            </span>
-            <h1 className="font-display text-4xl font-extrabold leading-[1.1] tracking-tight xl:text-5xl">
-              Pilotez votre parc de copieurs,
-              <span className="bg-gradient-to-r from-brand-300 via-violet-300 to-sky-300 bg-clip-text text-transparent"> sans friction.</span>
-            </h1>
-            <p className="mt-5 max-w-md text-base leading-relaxed text-ink-300">
-              Une seule plateforme pour vos contrats, vos interventions techniques et le suivi des compteurs de plus de 200 machines.
-            </p>
-
-            <ul className="mt-10 space-y-4">
-              {FEATURES.map(({ icon: Icon, title, text }) => (
-                <li key={title} className="flex items-start gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm transition hover:border-white/20 hover:bg-white/10">
-                  <span className="rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 p-2.5 shadow-glow">
-                    <Icon size={18} />
-                  </span>
-                  <div>
-                    <p className="text-sm font-semibold">{title}</p>
-                    <p className="mt-0.5 text-sm text-ink-400">{text}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <p className="text-xs text-ink-500">© {new Date().getFullYear()} BURINFORT · Service Technique / SAV</p>
         </div>
+
+        <div className="position-relative" style={{ maxWidth: '32rem' }}>
+          <span
+            className="d-inline-flex align-items-center gap-2 mb-4"
+            style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '50rem', padding: '0.35rem 1rem', fontSize: '0.75rem', fontWeight: 600, color: 'rgba(255,255,255,0.8)' }}
+          >
+            <Sparkles size={13} /> Plateforme SAV nouvelle génération
+          </span>
+          <h1 style={{ fontWeight: 800, fontSize: 'clamp(1.75rem, 3vw, 2.5rem)', lineHeight: 1.1, letterSpacing: '-0.03em', marginBottom: '1rem' }}>
+            Pilotez votre parc de copieurs,{' '}
+            <span style={{ background: 'linear-gradient(90deg, #93c5fd, #c4b5fd)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              sans friction.
+            </span>
+          </h1>
+          <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.65)', lineHeight: 1.7, marginBottom: '2rem' }}>
+            Une seule plateforme pour vos contrats, vos interventions techniques et le suivi des compteurs de plus de 200 machines.
+          </p>
+          <div className="d-flex flex-column gap-3">
+            {FEATURES.map(({ icon: Icon, title, text }) => (
+              <div
+                key={title}
+                className="d-flex align-items-start gap-3"
+                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '0.75rem', padding: '1rem' }}
+              >
+                <div style={{ background: 'linear-gradient(135deg, #CC1416, #8b0000)', borderRadius: '0.5rem', padding: '0.5rem', flexShrink: 0 }}>
+                  <Icon size={16} />
+                </div>
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: '0.875rem', marginBottom: '0.15rem' }}>{title}</div>
+                  <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.55)' }}>{text}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <p className="position-relative" style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.35)' }}>
+          © {new Date().getFullYear()} BURINFORT · Service Technique / SAV
+        </p>
       </div>
 
-      {/* ------------ Formulaire ------------ */}
-      <div className="relative flex items-center justify-center bg-white px-6 py-12 sm:px-12">
-        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-500 via-violet-500 to-sky-500 lg:hidden" />
-        <div className="w-full max-w-sm animate-slide-up">
-          <div className="mb-8 flex items-center gap-3 lg:hidden">
-            <LogoMark size={40} />
-            <p className="font-display text-xl font-extrabold tracking-tight text-ink-900">BurinTrack</p>
+      {/* ---- Login form ---- */}
+      <div
+        className="d-flex align-items-center justify-content-center"
+        style={{ flex: 1, background: '#fff', padding: '2rem 1.5rem', minHeight: '100vh' }}
+      >
+        <div style={{ width: '100%', maxWidth: '22rem' }}>
+          {/* Mobile logo */}
+          <div className="d-flex d-lg-none align-items-center gap-3 mb-4">
+            <LogoMark size={38} />
+            <div style={{ fontWeight: 800, fontSize: '1.1rem', color: '#343a40' }}>BurinTrack</div>
           </div>
 
-          <h2 className="text-3xl font-extrabold text-ink-900">Bon retour 👋</h2>
-          <p className="mt-2 text-sm text-ink-500">Connectez-vous pour accéder à votre espace de gestion SAV.</p>
+          <h2 style={{ fontWeight: 800, fontSize: '1.5rem', color: '#343a40', marginBottom: '0.35rem' }}>
+            Bon retour 👋
+          </h2>
+          <p className="text-muted mb-4" style={{ fontSize: '0.875rem' }}>
+            Connectez-vous pour accéder à votre espace de gestion SAV.
+          </p>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-5" noValidate>
-            <div>
-              <label htmlFor="email" className="label">Adresse e-mail</label>
-              <div className="relative">
-                <Mail size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-400" />
+          <form onSubmit={handleSubmit(onSubmit)} noValidate>
+            {/* Email */}
+            <div className="mb-3">
+              <label className="form-label" htmlFor="email">Adresse e-mail</label>
+              <div className="input-group">
+                <span className="input-group-text bg-white" style={{ borderColor: '#dee2e6' }}>
+                  <Mail size={15} className="text-muted" />
+                </span>
                 <input
                   id="email"
                   type="email"
                   autoComplete="username"
-                  className={`input pl-10 ${errors.email ? 'input-error' : ''}`}
+                  className={`form-control border-start-0 ps-0 ${errors.email ? 'is-invalid' : ''}`}
                   placeholder="nom@burinfort.com"
                   {...register('email')}
                 />
+                {errors.email && <div className="invalid-feedback">{errors.email.message}</div>}
               </div>
-              {errors.email && <p className="mt-1.5 text-xs font-medium text-rose-600">{errors.email.message}</p>}
             </div>
 
-            <div>
-              <label htmlFor="motDePasse" className="label">Mot de passe</label>
-              <div className="relative">
-                <Lock size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-400" />
+            {/* Mot de passe */}
+            <div className="mb-3">
+              <label className="form-label" htmlFor="motDePasse">Mot de passe</label>
+              <div className="input-group">
+                <span className="input-group-text bg-white" style={{ borderColor: '#dee2e6' }}>
+                  <Lock size={15} className="text-muted" />
+                </span>
                 <input
                   id="motDePasse"
                   type={showPwd ? 'text' : 'password'}
                   autoComplete="current-password"
-                  className={`input pl-10 pr-11 ${errors.motDePasse ? 'input-error' : ''}`}
+                  className={`form-control border-start-0 border-end-0 ps-0 ${errors.motDePasse ? 'is-invalid' : ''}`}
                   placeholder="••••••••"
                   {...register('motDePasse')}
                 />
                 <button
                   type="button"
+                  className="input-group-text bg-white"
                   onClick={() => setShowPwd((v) => !v)}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-ink-400 hover:bg-ink-100 hover:text-ink-700"
-                  aria-label={showPwd ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                  aria-label={showPwd ? 'Masquer' : 'Afficher'}
+                  style={{ cursor: 'pointer', border: '1px solid #ced4da', borderLeft: 'none' }}
                 >
-                  {showPwd ? <EyeOff size={16} /> : <Eye size={16} />}
+                  {showPwd ? <EyeOff size={15} className="text-muted" /> : <Eye size={15} className="text-muted" />}
                 </button>
+                {errors.motDePasse && <div className="invalid-feedback">{errors.motDePasse.message}</div>}
               </div>
-              {errors.motDePasse && <p className="mt-1.5 text-xs font-medium text-rose-600">{errors.motDePasse.message}</p>}
             </div>
 
             {error && (
-              <div role="alert" className="flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 animate-fade-in">
-                <ShieldCheck size={16} className="mt-0.5 shrink-0" />
+              <div className="alert alert-danger d-flex align-items-start gap-2 py-2 px-3 mb-3 animate-fade-in" style={{ fontSize: '0.85rem' }}>
                 {error}
               </div>
             )}
 
-            <button type="submit" disabled={isSubmitting} className="btn-primary w-full py-3 text-base">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="btn btn-primary btn-lg w-100 d-flex align-items-center justify-content-center gap-2"
+            >
               {isSubmitting ? (
                 <>
-                  <Spinner size={18} /> Connexion…
+                  <Spinner size={17} /> Connexion…
                 </>
               ) : (
-                <>
-                  Se connecter <ArrowRight size={18} />
-                </>
+                'Se connecter'
               )}
             </button>
           </form>
@@ -184,15 +270,15 @@ export default function LoginPage() {
               type="button"
               onClick={() => {
                 setValue('email', 'admin@burinfort.com', { shouldValidate: true });
-                setValue('motDePasse', 'Admin@2026!', { shouldValidate: true });
+                setValue('motDePasse', 'BurinTrack@2026!', { shouldValidate: true });
               }}
-              className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-brand-300 bg-brand-50/60 py-2.5 text-xs font-semibold text-brand-700 transition hover:bg-brand-50"
+              className="btn btn-sm btn-outline-primary w-100 mt-3 d-flex align-items-center justify-content-center gap-2"
             >
-              <Sparkles size={14} /> Remplir avec le compte de démonstration
+              <Sparkles size={13} /> Compte de démonstration
             </button>
           )}
 
-          <p className="mt-10 text-center text-xs text-ink-400">
+          <p className="text-center text-muted mt-4" style={{ fontSize: '0.75rem' }}>
             Application interne BURINFORT · Connexion sécurisée
           </p>
         </div>

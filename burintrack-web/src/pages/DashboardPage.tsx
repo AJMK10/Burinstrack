@@ -1,9 +1,12 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   ArrowUpRight,
+  Bell,
   CalendarClock,
+  CheckCircle2,
+  Clock,
   FileCheck2,
   Printer,
   Repeat,
@@ -11,7 +14,7 @@ import {
   Wrench,
 } from 'lucide-react';
 import api from '../lib/api';
-import type { Dashboard } from '../types';
+import type { Dashboard, Intervention, Technicien } from '../types';
 import { useAuthStore } from '../store/authStore';
 import {
   formatCompact,
@@ -19,14 +22,16 @@ import {
   formatNumber,
   greeting,
   NATURE,
+  STATUT_INTERVENTION,
   TONE,
   TONE_HEX,
   type Tone,
 } from '../lib/format';
 import { AreaChart, Donut, HBars, Legend, Sparkline, StackedBars } from '../components/charts';
-import { Avatar, Badge, EmptyState, ErrorState, Skeleton } from '../components/ui';
+import { Avatar, Badge, EmptyState, ErrorState, Spinner } from '../components/ui';
+import { toast } from '../store/toastStore';
 
-function Kpi({
+function StatCard({
   title,
   value,
   hint,
@@ -34,7 +39,6 @@ function Kpi({
   tone,
   to,
   spark,
-  delay,
 }: {
   title: string;
   value: number;
@@ -43,24 +47,33 @@ function Kpi({
   tone: Tone;
   to: string;
   spark?: number[];
-  delay: number;
 }) {
+  const colors: Record<Tone, string> = {
+    brand:   '#CC1416',
+    emerald: '#10b981',
+    amber:   '#f59e0b',
+    rose:    '#ef4444',
+    sky:     '#0ea5e9',
+    violet:  '#8b5cf6',
+    slate:   '#94a3b8',
+  };
   return (
-    <Link
-      to={to}
-      className="card card-hover group relative overflow-hidden animate-slide-up"
-      style={{ animationDelay: `${delay}ms` }}
-    >
-      <div className="flex items-start justify-between">
-        <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${TONE[tone].soft}`}>{icon}</div>
-        <ArrowUpRight size={18} className="text-ink-300 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-brand-500" />
+    <Link to={to} className="stat-card text-decoration-none animate-slide-up">
+      <div className="d-flex align-items-start justify-content-between mb-3">
+        <div
+          className={`stat-icon ${TONE[tone].soft}`}
+          style={{ color: colors[tone] }}
+        >
+          {icon}
+        </div>
+        <ArrowUpRight size={16} className="text-muted" />
       </div>
-      <p className="mt-4 text-sm font-medium text-ink-500">{title}</p>
-      <p className="mt-1 font-display text-4xl font-extrabold tracking-tight text-ink-900 tabular-nums">{formatNumber(value)}</p>
-      <div className="mt-3 text-xs font-medium text-ink-500">{hint}</div>
-      {spark && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 opacity-80">
-          <Sparkline values={spark} color={TONE_HEX[tone]} />
+      <div className="stat-label">{title}</div>
+      <div className="stat-value">{formatNumber(value)}</div>
+      <div className="stat-hint">{hint}</div>
+      {spark && spark.length > 1 && (
+        <div style={{ pointerEvents: 'none', marginTop: '0.5rem', opacity: 0.7 }}>
+          <Sparkline values={spark} color={colors[tone]} />
         </div>
       )}
     </Link>
@@ -72,52 +85,205 @@ function Section({
   subtitle,
   action,
   children,
-  className = '',
-  delay = 0,
 }: {
   title: string;
   subtitle?: string;
   action?: ReactNode;
   children: ReactNode;
-  className?: string;
-  delay?: number;
 }) {
   return (
-    <section className={`card animate-slide-up ${className}`} style={{ animationDelay: `${delay}ms` }}>
-      <div className="mb-5 flex items-start justify-between gap-3">
+    <div className="card animate-slide-up">
+      <div className="card-header d-flex align-items-start justify-content-between gap-2">
         <div>
-          <h2 className="text-base font-bold text-ink-900">{title}</h2>
-          {subtitle && <p className="mt-0.5 text-xs text-ink-500">{subtitle}</p>}
+          <div style={{ fontWeight: 700, fontSize: '0.875rem', color: '#343a40' }}>{title}</div>
+          {subtitle && <div className="text-muted mt-1" style={{ fontSize: '0.75rem' }}>{subtitle}</div>}
         </div>
         {action}
       </div>
-      {children}
-    </section>
+      <div className="card-body">{children}</div>
+    </div>
   );
 }
 
 function DashboardSkeleton() {
   return (
-    <div className="space-y-6">
-      <Skeleton className="h-44 w-full !rounded-3xl" />
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div>
+      <div className="skeleton mb-4" style={{ height: 120, borderRadius: '0.75rem' }} />
+      <div className="row g-3 mb-4">
         {[0, 1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-40 !rounded-2xl" />
+          <div key={i} className="col-sm-6 col-xl-3">
+            <div className="skeleton" style={{ height: 140, borderRadius: '0.5rem' }} />
+          </div>
         ))}
       </div>
-      <div className="grid gap-6 xl:grid-cols-3">
-        <Skeleton className="h-80 !rounded-2xl xl:col-span-2" />
-        <Skeleton className="h-80 !rounded-2xl" />
+      <div className="row g-3">
+        <div className="col-xl-8"><div className="skeleton" style={{ height: 320, borderRadius: '0.5rem' }} /></div>
+        <div className="col-xl-4"><div className="skeleton" style={{ height: 320, borderRadius: '0.5rem' }} /></div>
       </div>
     </div>
   );
 }
 
-export default function DashboardPage() {
+function TechnicienDashboard({ userEmail, userName }: { userEmail: string; userName: string }) {
+  const imgDash = useDashboardImage();
+  const { data: techniciens = [], isLoading: loadingTech } = useQuery<Technicien[]>({
+    queryKey: ['techniciens'],
+    queryFn: () => api.get('/techniciens').then((r) => r.data),
+  });
+
+  const moi = techniciens.find((t) => t.email.toLowerCase() === userEmail.toLowerCase());
+
+  const { data: interventions = [], isLoading: loadingIntv } = useQuery<Intervention[]>({
+    queryKey: ['interventions', { technicienId: moi?.id }],
+    queryFn: () => api.get('/interventions', { params: { technicienId: moi?.id, taille: 100 } }).then((r) => r.data),
+    enabled: !!moi,
+  });
+
+  const ouvertes  = interventions.filter((i) => i.statut === 'Ouverte');
+  const enCours   = interventions.filter((i) => i.statut === 'EnCours');
+  const resolues  = interventions.filter((i) => i.statut === 'Resolue' || i.statut === 'Fermee');
+  const actives   = [...ouvertes, ...enCours];
+  const prenom = (userName || userEmail).split(/[@\s.]/)[0] ?? '';
+  const prenomAffiche = prenom ? prenom.charAt(0).toUpperCase() + prenom.slice(1) : '';
+
+  if (loadingTech || loadingIntv) return <DashboardSkeleton />;
+
+  return (
+    <div>
+      {/* Banner */}
+      <div
+        className="rounded-3 mb-4 p-4 animate-slide-up"
+        style={{ background: 'linear-gradient(135deg, #3d0506 0%, #7a0a0b 40%, #CC1416 100%)', color: '#fff', position: 'relative', overflow: 'hidden' }}
+      >
+        <div style={{ position: 'absolute', top: '-4rem', right: '-4rem', width: '18rem', height: '18rem', borderRadius: '50%', background: 'rgba(255,200,100,0.15)', filter: 'blur(50px)' }} />
+        {imgDash && (
+          <img
+            src={imgDash}
+            alt=""
+            aria-hidden
+            style={{
+              position: 'absolute', right: 0, bottom: 0, height: '100%', maxWidth: '40%',
+              objectFit: 'contain', objectPosition: 'right bottom',
+              maskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0.85) 100%)',
+              WebkitMaskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0.85) 100%)',
+              pointerEvents: 'none',
+            }}
+          />
+        )}
+        <div className="d-flex flex-wrap align-items-end justify-content-between gap-3 position-relative">
+          <div>
+            <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.65)', marginBottom: '0.35rem' }}>
+              {greeting()}{prenomAffiche && `, ${prenomAffiche}`} 👋
+            </p>
+            <h2 style={{ fontWeight: 800, fontSize: 'clamp(1.1rem, 2.5vw, 1.5rem)', marginBottom: '0.35rem', letterSpacing: '-0.02em' }}>
+              {actives.length > 0 ? (
+                <><span style={{ color: '#fbbf24' }}>{actives.length}</span> intervention{actives.length > 1 ? 's' : ''} à traiter</>
+              ) : ('Tout est à jour, bravo !')}
+            </h2>
+            {moi && (
+              <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)', margin: 0 }}>
+                {moi.nomComplet} · {moi.telephone} · {moi.totalInterventions} intervention{moi.totalInterventions > 1 ? 's' : ''} au total
+              </p>
+            )}
+          </div>
+          <Link to="/interventions" className="btn btn-light btn-sm d-flex align-items-center gap-1">
+            <Wrench size={14} /> Mes interventions
+          </Link>
+        </div>
+      </div>
+
+      {/* KPI */}
+      <div className="row g-3 mb-4">
+        <div className="col-sm-4">
+          <div className="stat-card animate-slide-up">
+            <div className={`stat-icon ${TONE['sky'].soft}`} style={{ color: TONE_HEX.sky }}><Clock size={20} /></div>
+            <div className="stat-label">Ouvertes</div>
+            <div className="stat-value">{ouvertes.length}</div>
+            <div className="stat-hint">À prendre en charge</div>
+          </div>
+        </div>
+        <div className="col-sm-4">
+          <div className="stat-card animate-slide-up">
+            <div className={`stat-icon ${TONE['amber'].soft}`} style={{ color: TONE_HEX.amber }}><Wrench size={20} /></div>
+            <div className="stat-label">En cours</div>
+            <div className="stat-value">{enCours.length}</div>
+            <div className="stat-hint">Interventions actives</div>
+          </div>
+        </div>
+        <div className="col-sm-4">
+          <div className="stat-card animate-slide-up">
+            <div className={`stat-icon ${TONE['emerald'].soft}`} style={{ color: TONE_HEX.emerald }}><CheckCircle2 size={20} /></div>
+            <div className="stat-label">Résolues</div>
+            <div className="stat-value">{resolues.length}</div>
+            <div className="stat-hint">Fermées ou résolues</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Liste des interventions actives */}
+      <Section title="Mes interventions actives" subtitle={`${actives.length} à traiter`}>
+        {actives.length === 0 ? (
+          <EmptyState icon={<CheckCircle2 size={20} />} title="Aucune intervention active" text="Toutes vos interventions sont résolues ou fermées." />
+        ) : (
+          <div className="table-responsive">
+            <table className="table table-hover mb-0">
+              <thead>
+                <tr><th>N°</th><th>Client</th><th>Machine</th><th>Nature</th><th>Date</th><th>Statut</th></tr>
+              </thead>
+              <tbody>
+                {actives.map((i) => {
+                  const cfg = STATUT_INTERVENTION[i.statut];
+                  const nat = NATURE[i.nature];
+                  return (
+                    <tr key={i.id} style={{ fontSize: '0.85rem' }}>
+                      <td className="font-mono text-muted" style={{ fontSize: '0.75rem' }}>{i.numeroIntervention}</td>
+                      <td className="fw-semibold">{i.nomClient}</td>
+                      <td>
+                        <div>{i.designationCopieur}</div>
+                        <div className="font-mono text-muted" style={{ fontSize: '0.72rem' }}>{i.numeroSerie}</div>
+                      </td>
+                      <td><Badge tone={nat.tone}>{nat.label}</Badge></td>
+                      <td>{formatDate(i.dateIntervention)}</td>
+                      <td><Badge tone={cfg.tone}>{cfg.label}</Badge></td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Section>
+    </div>
+  );
+}
+
+function useDashboardImage() {
+  const { data } = useQuery<string>({
+    queryKey: ['parametres-img-dashboard'],
+    queryFn: async () => {
+      const r = await api.get('/parametres');
+      const found = (r.data as { cle: string; valeur: string }[]).find((p) => p.cle === 'entreprise');
+      if (!found) return '';
+      try { return (JSON.parse(found.valeur) as { imageDashboard?: string }).imageDashboard ?? ''; }
+      catch { return ''; }
+    },
+    staleTime: 1000 * 60 * 10,
+  });
+  return data ?? '';
+}
+
+function AdminDashboard() {
   const user = useAuthStore((s) => s.user);
+  const imgDash = useDashboardImage();
   const { data, isLoading, isError, refetch } = useQuery<Dashboard>({
     queryKey: ['dashboard'],
     queryFn: () => api.get('/dashboard').then((r) => r.data),
+  });
+  const canAlert = user?.roles?.some((r) => ['Administrateur', 'ResponsableSAV'].includes(r)) ?? false;
+  const alertMut = useMutation({
+    mutationFn: () => api.post('/dashboard/alertes-contrats').then((r) => r.data),
+    onSuccess: (d) => toast.success('Alertes envoyées', d.message),
+    onError: () => toast.error('Erreur', "L'envoi des alertes a échoué. Vérifiez la configuration SMTP."),
   });
 
   if (isLoading) return <DashboardSkeleton />;
@@ -131,279 +297,340 @@ export default function DashboardPage() {
   const prenomAffiche = prenom ? prenom.charAt(0).toUpperCase() + prenom.slice(1) : '';
 
   const statuts = [
-    { label: 'Ouvertes', value: data.interventionsOuvertes, color: TONE_HEX.sky },
-    { label: 'En cours', value: data.interventionsEnCours, color: TONE_HEX.amber },
-    { label: 'Résolues', value: data.interventionsResolues, color: TONE_HEX.emerald },
-    { label: 'Fermées', value: data.interventionsFermees, color: TONE_HEX.slate },
+    { label: 'Ouvertes',  value: data.interventionsOuvertes,  color: TONE_HEX.sky     },
+    { label: 'En cours',  value: data.interventionsEnCours,   color: TONE_HEX.amber   },
+    { label: 'Résolues',  value: data.interventionsResolues,  color: TONE_HEX.emerald },
+    { label: 'Fermées',   value: data.interventionsFermees,   color: TONE_HEX.slate   },
   ];
 
   const maxNature = Math.max(1, ...data.interventionsParNature.map((n) => n.valeur));
 
   return (
-    <div className="space-y-6">
-      {/* ---------------- Bannière ---------------- */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-700 via-brand-800 to-brand-950 p-6 text-white shadow-lift animate-slide-up sm:p-8">
-        <div className="bg-grid absolute inset-0 opacity-50 [mask-image:linear-gradient(to_left,black,transparent)]" />
-        <div className="absolute -right-10 -top-20 h-72 w-72 rounded-full bg-violet-400/30 blur-3xl" />
-        <div className="absolute -bottom-24 left-1/3 h-64 w-64 rounded-full bg-sky-400/20 blur-3xl" />
-        <div className="relative flex flex-wrap items-end justify-between gap-6">
-          <div className="max-w-2xl">
-            <p className="text-sm font-medium text-brand-200">{greeting()}{prenomAffiche && `, ${prenomAffiche}`} 👋</p>
-            <h1 className="mt-2 font-display text-2xl font-extrabold leading-tight sm:text-3xl">
+    <div>
+      {/* ---- Banner ---- */}
+      <div
+        className="rounded-3 mb-4 p-4 animate-slide-up"
+        style={{ background: 'linear-gradient(135deg, #3d0506 0%, #7a0a0b 40%, #CC1416 100%)', color: '#fff', position: 'relative', overflow: 'hidden' }}
+      >
+        <div style={{ position: 'absolute', top: '-4rem', right: '-4rem', width: '18rem', height: '18rem', borderRadius: '50%', background: 'rgba(255,200,100,0.15)', filter: 'blur(50px)' }} />
+        {imgDash && (
+          <img
+            src={imgDash}
+            alt=""
+            aria-hidden
+            style={{
+              position: 'absolute', right: 0, bottom: 0, height: '100%', maxWidth: '40%',
+              objectFit: 'contain', objectPosition: 'right bottom',
+              maskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0.85) 100%)',
+              WebkitMaskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0.85) 100%)',
+              pointerEvents: 'none',
+            }}
+          />
+        )}
+        <div className="d-flex flex-wrap align-items-end justify-content-between gap-3 position-relative">
+          <div>
+            <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.65)', marginBottom: '0.35rem' }}>
+              {greeting()}{prenomAffiche && `, ${prenomAffiche}`} 👋
+            </p>
+            <h2 style={{ fontWeight: 800, fontSize: 'clamp(1.1rem, 2.5vw, 1.5rem)', marginBottom: '0.35rem', letterSpacing: '-0.02em' }}>
               {aTraiter > 0 ? (
                 <>
-                  <span className="text-amber-300">{aTraiter}</span> intervention{aTraiter > 1 ? 's' : ''} à traiter aujourd'hui
+                  <span style={{ color: '#fbbf24' }}>{aTraiter}</span>{' '}
+                  intervention{aTraiter > 1 ? 's' : ''} à traiter aujourd'hui
                 </>
               ) : (
                 'Tout est à jour, bravo !'
               )}
-            </h1>
-            <p className="mt-2 text-sm text-brand-100/90">
+            </h2>
+            <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)', margin: 0 }}>
               {data.contratsExpirant30 > 0
-                ? `${data.contratsExpirant30} contrat(s) arrivent à échéance dans les 30 prochains jours.`
-                : 'Aucun contrat n’arrive à échéance dans les 30 prochains jours.'}{' '}
+                ? `${data.contratsExpirant30} contrat(s) arrivent à échéance dans 30 jours.`
+                : 'Aucun contrat en échéance dans 30 jours.'}{' '}
               {data.totalTechniciens} technicien{data.totalTechniciens > 1 ? 's' : ''} actif{data.totalTechniciens > 1 ? 's' : ''}.
             </p>
           </div>
-          <div className="flex flex-wrap gap-3">
-            <Link to="/interventions" className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-brand-700 shadow-soft transition hover:bg-brand-50">
-              <Wrench size={16} /> Voir les interventions
+          <div className="d-flex gap-2 flex-wrap">
+            <Link to="/interventions" className="btn btn-light btn-sm d-flex align-items-center gap-1">
+              <Wrench size={14} /> Interventions
             </Link>
-            <Link to="/carte" className="inline-flex items-center gap-2 rounded-xl border border-white/25 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/20">
+            <Link to="/carte" className="btn btn-sm d-flex align-items-center gap-1" style={{ background: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' }}>
               Ouvrir la carte
             </Link>
+            {canAlert && (
+              <button
+                className="btn btn-sm d-flex align-items-center gap-1"
+                style={{ background: data.contratsExpirant60 > 0 ? '#fbbf24' : 'rgba(255,255,255,0.1)', color: data.contratsExpirant60 > 0 ? '#1c1917' : '#fff', border: 'none', fontWeight: 600 }}
+                onClick={() => alertMut.mutate()}
+                disabled={alertMut.isPending}
+                title={`Envoyer les alertes d'expiration à tous les utilisateurs`}
+              >
+                {alertMut.isPending ? <Spinner size={14} /> : <Bell size={14} />}
+                {data.contratsExpirant60 > 0 ? `Alerter (${data.contratsExpirant60})` : 'Alertes contrats'}
+              </button>
+            )}
           </div>
         </div>
-      </section>
-
-      {/* ---------------- KPI ---------------- */}
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Kpi
-          title="Clients actifs"
-          value={data.totalClients}
-          icon={<Users size={22} />}
-          tone="brand"
-          to="/clients"
-          delay={60}
-          hint={<>Sous contrat de maintenance</>}
-        />
-        <Kpi
-          title="Copieurs sous contrat"
-          value={data.totalCopieurs}
-          icon={<Printer size={22} />}
-          tone="violet"
-          to="/copieurs"
-          delay={120}
-          hint={<>Répartis chez {data.totalClients} clients</>}
-        />
-        <Kpi
-          title="Contrats actifs"
-          value={data.contratsActifs}
-          icon={<FileCheck2 size={22} />}
-          tone="emerald"
-          to="/copieurs"
-          delay={180}
-          hint={
-            <span className="inline-flex items-center gap-2">
-              <Badge tone="emerald">{tauxContrats}%</Badge> du parc couvert
-            </span>
-          }
-        />
-        <Kpi
-          title="Interventions ouvertes"
-          value={aTraiter}
-          icon={<Wrench size={22} />}
-          tone="amber"
-          to="/interventions"
-          delay={240}
-          spark={data.interventionsParMois.map((m) => m.total)}
-          hint={
-            <span>
-              {data.interventionsOuvertes} ouverte(s) · {data.interventionsEnCours} en cours
-            </span>
-          }
-        />
       </div>
 
-      {/* ---------------- Activité ---------------- */}
-      <div className="grid gap-6 xl:grid-cols-3">
-        <Section
-          title="Activité des interventions"
-          subtitle="Six derniers mois — total et pannes"
-          className="xl:col-span-2"
-          delay={100}
-          action={
-            <div className="flex items-center gap-4 text-xs font-medium text-ink-500">
-              <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-brand-500" />Interventions</span>
-              <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-rose-500" />Pannes</span>
-            </div>
-          }
-        >
-          <AreaChart
-            data={data.interventionsParMois.map((m) => ({ label: m.libelle, a: m.total, b: m.pannes }))}
-            labelA="Interventions"
-            labelB="Pannes"
+      {/* ---- KPI cards ---- */}
+      <div className="row g-3 mb-4">
+        <div className="col-sm-6 col-xl-3">
+          <StatCard
+            title="Clients actifs"
+            value={data.totalClients}
+            icon={<Users size={20} />}
+            tone="brand"
+            to="/clients"
+            hint="Sous contrat de maintenance"
           />
-        </Section>
+        </div>
+        <div className="col-sm-6 col-xl-3">
+          <StatCard
+            title="Copieurs sous contrat"
+            value={data.totalCopieurs}
+            icon={<Printer size={20} />}
+            tone="violet"
+            to="/copieurs"
+            hint={`Répartis chez ${data.totalClients} clients`}
+          />
+        </div>
+        <div className="col-sm-6 col-xl-3">
+          <StatCard
+            title="Contrats actifs"
+            value={data.contratsActifs}
+            icon={<FileCheck2 size={20} />}
+            tone="emerald"
+            to="/copieurs"
+            hint={<span><Badge tone="emerald">{tauxContrats}%</Badge> du parc couvert</span>}
+          />
+        </div>
+        <div className="col-sm-6 col-xl-3">
+          <StatCard
+            title="Interventions ouvertes"
+            value={aTraiter}
+            icon={<Wrench size={20} />}
+            tone="amber"
+            to="/interventions"
+            spark={data.interventionsParMois.map((m) => m.total)}
+            hint={`${data.interventionsOuvertes} ouverte(s) · ${data.interventionsEnCours} en cours`}
+          />
+        </div>
+      </div>
 
-        <Section title="Statut des interventions" subtitle={`${formatNumber(totalInterventions)} au total`} delay={160}>
-          <Donut
-            slices={statuts}
-            center={
-              <>
-                <span className="font-display text-3xl font-extrabold text-ink-900">{aTraiter}</span>
-                <span className="text-xs font-medium text-ink-500">à traiter</span>
-              </>
+      {/* ---- Activité ---- */}
+      <div className="row g-3 mb-4">
+        <div className="col-xl-8">
+          <Section
+            title="Activité des interventions"
+            subtitle="Six derniers mois — total et pannes"
+            action={
+              <div className="d-flex gap-3" style={{ fontSize: '0.75rem', color: '#6c757d' }}>
+                <span className="d-flex align-items-center gap-1">
+                  <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#CC1416', display: 'inline-block' }} />
+                  Interventions
+                </span>
+                <span className="d-flex align-items-center gap-1">
+                  <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#f43f5e', display: 'inline-block' }} />
+                  Pannes
+                </span>
+              </div>
             }
-          />
-          <div className="mt-6">
-            <Legend items={statuts.map((s) => ({ label: s.label, value: s.value, color: s.color }))} />
-          </div>
-        </Section>
+          >
+            <AreaChart
+              data={data.interventionsParMois.map((m) => ({ label: m.libelle, a: m.total, b: m.pannes }))}
+              labelA="Interventions"
+              labelB="Pannes"
+            />
+          </Section>
+        </div>
+        <div className="col-xl-4">
+          <Section
+            title="Statut des interventions"
+            subtitle={`${formatNumber(totalInterventions)} au total`}
+          >
+            <Donut
+              slices={statuts}
+              center={
+                <>
+                  <span style={{ fontWeight: 800, fontSize: '1.75rem', color: '#343a40', lineHeight: 1 }}>{aTraiter}</span>
+                  <span style={{ fontSize: '0.75rem', color: '#6c757d' }}>à traiter</span>
+                </>
+              }
+            />
+            <div className="mt-4">
+              <Legend items={statuts.map((s) => ({ label: s.label, value: s.value, color: s.color }))} />
+            </div>
+          </Section>
+        </div>
       </div>
 
-      {/* ---------------- Techniciens / natures / pannes ---------------- */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        <Section title="Interventions par technicien" subtitle="Total et part résolue" delay={120}>
-          {data.interventionsParTechnicien.length === 0 ? (
-            <p className="py-6 text-center text-sm text-ink-400">Aucune donnée.</p>
-          ) : (
-            <HBars
-              rows={data.interventionsParTechnicien.map((t) => ({
-                label: t.nomTechnicien,
-                total: t.nombreInterventions,
-                done: t.interventionsResolues,
-              }))}
-            />
-          )}
-        </Section>
+      {/* ---- Techniciens / natures / pannes ---- */}
+      <div className="row g-3 mb-4">
+        <div className="col-lg-4">
+          <Section title="Interventions par technicien" subtitle="Total et part résolue">
+            {data.interventionsParTechnicien.length === 0 ? (
+              <p className="text-center text-muted py-4" style={{ fontSize: '0.85rem' }}>Aucune donnée.</p>
+            ) : (
+              <HBars
+                rows={data.interventionsParTechnicien.map((t) => ({
+                  label: t.nomTechnicien,
+                  total: t.nombreInterventions,
+                  done: t.interventionsResolues,
+                }))}
+              />
+            )}
+          </Section>
+        </div>
 
-        <Section title="Nature des demandes" subtitle="Répartition de toutes les interventions" delay={180}>
-          <ul className="space-y-3.5">
-            {data.interventionsParNature.map((n) => {
-              const cfg = NATURE[n.cle];
-              return (
-                <li key={n.cle}>
-                  <div className="mb-1.5 flex items-center justify-between text-sm">
-                    <span className="font-medium text-ink-700">{cfg.label}</span>
-                    <span className="font-semibold tabular-nums text-ink-900">{n.valeur}</span>
-                  </div>
-                  <div className="h-2 overflow-hidden rounded-full bg-ink-100">
-                    <div
-                      className="h-full origin-left rounded-full animate-grow-x"
-                      style={{ width: `${(n.valeur / maxNature) * 100}%`, background: TONE_HEX[cfg.tone] }}
-                    />
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        </Section>
-
-        <Section
-          title="Pannes récurrentes"
-          subtitle="Machines à surveiller en priorité"
-          delay={240}
-          action={<Repeat size={18} className="text-rose-400" />}
-        >
-          {data.pannesRecurrentes.length === 0 ? (
-            <EmptyState icon={<Repeat size={22} />} title="Aucune panne récurrente" text="Aucune machine n'a connu 2 pannes ou plus." />
-          ) : (
-            <ul className="space-y-3">
-              {data.pannesRecurrentes.map((p) => (
-                <li key={p.copieurId} className="flex items-center gap-3 rounded-xl border border-ink-100 p-3 transition hover:border-rose-200 hover:bg-rose-50/40">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-50 font-display text-base font-extrabold text-rose-600">
-                    {p.nombrePannes}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-ink-900">{p.designation}</p>
-                    <p className="truncate text-xs text-ink-500">{p.nomClient} · {p.numeroSerie}</p>
-                  </div>
-                </li>
-              ))}
+        <div className="col-lg-4">
+          <Section title="Nature des demandes" subtitle="Répartition de toutes les interventions">
+            <ul className="list-unstyled mb-0">
+              {data.interventionsParNature.map((n) => {
+                const cfg = NATURE[n.cle];
+                const pct = Math.round((n.valeur / maxNature) * 100);
+                return (
+                  <li key={n.cle} className="mb-3">
+                    <div className="d-flex justify-content-between align-items-center mb-1" style={{ fontSize: '0.85rem' }}>
+                      <span className="fw-medium" style={{ color: '#343a40' }}>{cfg.label}</span>
+                      <span className="fw-semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>{n.valeur}</span>
+                    </div>
+                    <div className="progress" style={{ height: 6, borderRadius: '50rem' }}>
+                      <div
+                        className="progress-bar animate-grow-x"
+                        style={{ width: `${pct}%`, background: TONE_HEX[cfg.tone], borderRadius: '50rem' }}
+                      />
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
-          )}
-        </Section>
+          </Section>
+        </div>
+
+        <div className="col-lg-4">
+          <Section
+            title="Pannes récurrentes"
+            subtitle="Machines à surveiller en priorité"
+            action={<Repeat size={16} className="text-danger" />}
+          >
+            {data.pannesRecurrentes.length === 0 ? (
+              <EmptyState icon={<Repeat size={20} />} title="Aucune panne récurrente" text="Aucune machine n'a connu 2 pannes ou plus." />
+            ) : (
+              <ul className="list-unstyled mb-0">
+                {data.pannesRecurrentes.map((p) => (
+                  <li key={p.copieurId} className="d-flex align-items-center gap-3 p-2 mb-2 border rounded-2">
+                    <div
+                      className="d-flex align-items-center justify-content-center flex-shrink-0 rounded-2"
+                      style={{ width: 40, height: 40, background: '#fee2e2', color: '#991b1b', fontWeight: 800, fontSize: '1rem' }}
+                    >
+                      {p.nombrePannes}
+                    </div>
+                    <div style={{ minWidth: 0 }}>
+                      <div className="text-truncate fw-semibold" style={{ fontSize: '0.85rem', color: '#343a40' }}>{p.designation}</div>
+                      <div className="text-truncate text-muted" style={{ fontSize: '0.75rem' }}>{p.nomClient} · {p.numeroSerie}</div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Section>
+        </div>
       </div>
 
-      {/* ---------------- Contrats & volumes ---------------- */}
-      <div className="grid gap-6 xl:grid-cols-5">
-        <Section
-          title="Contrats arrivant à échéance"
-          subtitle={`${data.contratsExpirant30} sous 30 jours · ${data.contratsExpirant60} sous 60 jours`}
-          className="overflow-hidden xl:col-span-3"
-          delay={120}
-          action={<CalendarClock size={18} className="text-amber-500" />}
-        >
-          {data.contratsExpirantBientot.length === 0 ? (
-            <EmptyState icon={<FileCheck2 size={22} />} title="Aucune échéance proche" text="Tous les contrats sont à jour pour les 60 prochains jours." />
-          ) : (
-            <div className="-mx-6 -mb-6 overflow-x-auto">
-              <table className="w-full min-w-[34rem] text-sm">
-                <thead className="table-head">
-                  <tr>
-                    <th className="px-6 py-3">Client</th>
-                    <th className="px-3 py-3">Machine</th>
-                    <th className="px-3 py-3">Échéance</th>
-                    <th className="px-6 py-3 text-right">Délai</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.contratsExpirantBientot.map((c) => {
-                    const tone: Tone = c.joursRestants < 0 ? 'rose' : c.joursRestants <= 15 ? 'rose' : c.joursRestants <= 30 ? 'amber' : 'sky';
-                    return (
-                      <tr key={c.copieurId} className="table-row">
-                        <td className="px-6 py-3">
-                          <div className="flex items-center gap-3">
-                            <Avatar name={c.nomClient} size={34} />
-                            <span className="max-w-44 truncate font-semibold text-ink-900">{c.nomClient}</span>
-                          </div>
-                        </td>
-                        <td className="px-3 py-3">
-                          <p className="max-w-48 truncate text-ink-800">{c.designation}</p>
-                          <p className="font-mono text-xs text-ink-400">{c.numeroSerie}</p>
-                        </td>
-                        <td className="px-3 py-3 text-ink-600">{formatDate(c.dateFinContrat)}</td>
-                        <td className="px-6 py-3 text-right">
-                          <Badge tone={tone} dot>
-                            {c.joursRestants < 0 ? `Expiré (${Math.abs(c.joursRestants)} j)` : `${c.joursRestants} j`}
-                          </Badge>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </Section>
+      {/* ---- Contrats & volumes ---- */}
+      <div className="row g-3">
+        <div className="col-xl-7">
+          <Section
+            title="Contrats arrivant à échéance"
+            subtitle={`${data.contratsExpirant30} sous 30 jours · ${data.contratsExpirant60} sous 60 jours`}
+            action={<CalendarClock size={16} className="text-warning" />}
+          >
+            {data.contratsExpirantBientot.length === 0 ? (
+              <EmptyState icon={<FileCheck2 size={20} />} title="Aucune échéance proche" text="Tous les contrats sont à jour pour les 60 prochains jours." />
+            ) : (
+              <div className="table-responsive">
+                <table className="table table-hover mb-0">
+                  <thead>
+                    <tr>
+                      <th>Client</th>
+                      <th>Machine</th>
+                      <th>Échéance</th>
+                      <th className="text-end">Délai</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.contratsExpirantBientot.map((c) => {
+                      const tone: Tone = c.joursRestants < 0 ? 'rose' : c.joursRestants <= 30 ? 'rose' : c.joursRestants <= 60 ? 'amber' : 'sky';
+                      return (
+                        <tr key={c.copieurId}>
+                          <td>
+                            <div className="d-flex align-items-center gap-2">
+                              <Avatar name={c.nomClient} size={32} />
+                              <span className="fw-semibold text-truncate" style={{ maxWidth: '10rem', fontSize: '0.85rem' }}>{c.nomClient}</span>
+                            </div>
+                          </td>
+                          <td>
+                            <div className="text-truncate" style={{ maxWidth: '10rem', fontSize: '0.85rem' }}>{c.designation}</div>
+                            <div className="font-mono text-muted" style={{ fontSize: '0.72rem' }}>{c.numeroSerie}</div>
+                          </td>
+                          <td style={{ fontSize: '0.85rem', color: '#6c757d' }}>{formatDate(c.dateFinContrat)}</td>
+                          <td className="text-end">
+                            <Badge tone={tone} dot>
+                              {c.joursRestants < 0 ? `Expiré (${Math.abs(c.joursRestants)} j)` : `${c.joursRestants} j`}
+                            </Badge>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </Section>
+        </div>
 
-        <Section
-          title="Volumes imprimés"
-          subtitle="Pages consommées par client (relevés)"
-          className="xl:col-span-2"
-          delay={180}
-        >
-          <div className="mb-6 grid grid-cols-2 gap-3">
-            <div className="rounded-2xl bg-ink-900 p-4 text-white">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-300">Noir &amp; blanc</p>
-              <p className="mt-1 font-display text-2xl font-extrabold tabular-nums">{formatCompact(data.volumesTotaux.totalNB)}</p>
+        <div className="col-xl-5">
+          <Section title="Volumes imprimés" subtitle="Pages consommées par client (relevés)">
+            <div className="row g-2 mb-4">
+              <div className="col-6">
+                <div className="rounded-3 p-3 text-white" style={{ background: '#343a40' }}>
+                  <div style={{ fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'rgba(255,255,255,0.5)', marginBottom: '0.25rem' }}>
+                    Noir &amp; blanc
+                  </div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>
+                    {formatCompact(data.volumesTotaux.totalNB)}
+                  </div>
+                </div>
+              </div>
+              <div className="col-6">
+                <div className="rounded-3 p-3 text-white" style={{ background: 'linear-gradient(135deg, #f59e0b, #8b5cf6, #f43f5e)' }}>
+                  <div style={{ fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'rgba(255,255,255,0.7)', marginBottom: '0.25rem' }}>
+                    Couleur
+                  </div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>
+                    {formatCompact(data.volumesTotaux.totalCouleur)}
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="rounded-2xl bg-gradient-to-br from-brand-500 via-violet-500 to-rose-400 p-4 text-white">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-white/80">Couleur</p>
-              <p className="mt-1 font-display text-2xl font-extrabold tabular-nums">{formatCompact(data.volumesTotaux.totalCouleur)}</p>
-            </div>
-          </div>
-          {data.volumesTotaux.parClient.length === 0 ? (
-            <p className="py-6 text-center text-sm text-ink-400">Aucun relevé.</p>
-          ) : (
-            <StackedBars
-              rows={data.volumesTotaux.parClient.map((v) => ({ label: v.nomClient, a: v.volumeNB, b: v.volumeCouleur }))}
-              format={formatCompact}
-            />
-          )}
-        </Section>
+            {data.volumesTotaux.parClient.length === 0 ? (
+              <p className="text-center text-muted py-4" style={{ fontSize: '0.85rem' }}>Aucun relevé.</p>
+            ) : (
+              <StackedBars
+                rows={data.volumesTotaux.parClient.map((v) => ({ label: v.nomClient, a: v.volumeNB, b: v.volumeCouleur }))}
+                format={formatCompact}
+              />
+            )}
+          </Section>
+        </div>
       </div>
     </div>
   );
+}
+
+export default function DashboardPage() {
+  const user = useAuthStore((s) => s.user);
+  const isTechnicien = user?.roles?.includes('Technicien') ?? false;
+  if (isTechnicien) return <TechnicienDashboard userEmail={user?.email ?? ''} userName={user?.nomComplet ?? ''} />;
+  return <AdminDashboard />;
 }

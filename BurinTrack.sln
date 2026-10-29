@@ -1,4 +1,4 @@
-
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
@@ -10,6 +10,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BurinTrack.Infrastructure", "src\BurinTrack.Infrastructure\BurinTrack.Infrastructure.csproj", "{A1B2C3D4-0003-0003-0003-000000000003}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BurinTrack.API", "src\BurinTrack.API\BurinTrack.API.csproj", "{A1B2C3D4-0004-0004-0004-000000000004}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{77E39F01-E89E-4EF7-93B7-2641C03630A6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BurinTrack.Tests", "tests\BurinTrack.Tests\BurinTrack.Tests.csproj", "{A2B9F0C7-CA84-4BB8-8816-74DFDA19E13A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,5 +37,12 @@ Global
 		{A1B2C3D4-0004-0004-0004-000000000004}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A1B2C3D4-0004-0004-0004-000000000004}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A1B2C3D4-0004-0004-0004-000000000004}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2B9F0C7-CA84-4BB8-8816-74DFDA19E13A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2B9F0C7-CA84-4BB8-8816-74DFDA19E13A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2B9F0C7-CA84-4BB8-8816-74DFDA19E13A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2B9F0C7-CA84-4BB8-8816-74DFDA19E13A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A2B9F0C7-CA84-4BB8-8816-74DFDA19E13A} = {77E39F01-E89E-4EF7-93B7-2641C03630A6}
 	EndGlobalSection
 EndGlobal

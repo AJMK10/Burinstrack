@@ -16,6 +16,7 @@ public class BurinTrackDbContext : IdentityDbContext<IdentityUser>
     public DbSet<Document> Documents => Set<Document>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<ReleveCompteur> Releves => Set<ReleveCompteur>();
+    public DbSet<Parametre> Parametres => Set<Parametre>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -30,6 +31,16 @@ public class BurinTrackDbContext : IdentityDbContext<IdentityUser>
         builder.Entity<IdentityUserLogin<string>>().ToTable("UserLogins");
         builder.Entity<IdentityRoleClaim<string>>().ToTable("RoleClaims");
         builder.Entity<IdentityUserToken<string>>().ToTable("UserTokens");
+
+        builder.Entity<Parametre>(e =>
+        {
+            e.HasKey(p => p.Cle);
+            e.HasData(
+                new Parametre { Cle = "entreprise", Valeur = "{\"nomSociete\":\"BURINFORT\",\"nomApplication\":\"BurinTrack\",\"adresse\":\"\",\"telephone\":\"\",\"email\":\"\",\"siteWeb\":\"\",\"logoBase64\":\"\"}", UpdatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+                new Parametre { Cle = "smtp", Valeur = "{\"hote\":\"\",\"port\":587,\"utilisateur\":\"\",\"motDePasse\":\"\",\"expediteur\":\"noreply@burinfort.com\",\"ssl\":true}", UpdatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+                new Parametre { Cle = "alertes", Valeur = "{\"seuilJours1\":30,\"seuilJours2\":60,\"envoyerAutoAuDemarrage\":false}", UpdatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc) }
+            );
+        });
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

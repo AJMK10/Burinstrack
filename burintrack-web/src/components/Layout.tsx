@@ -11,7 +11,6 @@ import {
   Menu,
   Printer,
   Users,
-  UserCog,
   Wrench,
   X,
 } from 'lucide-react';
@@ -34,7 +33,6 @@ const NAV = [
       { to: '/clients', icon: Users, label: 'Clients' },
       { to: '/copieurs', icon: Printer, label: 'Parc copieurs' },
       { to: '/interventions', icon: Wrench, label: 'Interventions' },
-      { to: '/techniciens', icon: UserCog, label: 'Techniciens' },
     ],
   },
 ];
@@ -45,7 +43,6 @@ const TITLES: Record<string, string> = {
   '/clients': 'Clients',
   '/copieurs': 'Parc copieurs',
   '/interventions': 'Interventions',
-  '/techniciens': 'Techniciens',
 };
 
 const ROLE_LABELS: Record<string, string> = {

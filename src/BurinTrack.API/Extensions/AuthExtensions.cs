@@ -35,6 +35,7 @@ public static class AuthExtensions
             opts.AddPolicy("CanManageClients", p => p.RequireRole("Administrateur", "ResponsableSAV"));
             opts.AddPolicy("CanAssignInterventions", p => p.RequireRole("Administrateur", "ResponsableSAV"));
             opts.AddPolicy("CanCreateIntervention", p => p.RequireRole("Administrateur", "ResponsableSAV", "Technicien"));
+            opts.AddPolicy("CanManageReleves", p => p.RequireRole("Administrateur", "ResponsableSAV", "Technicien"));
             opts.AddPolicy("CanViewAll", p => p.RequireAuthenticatedUser());
         });
 

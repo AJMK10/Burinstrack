@@ -1,8 +1,8 @@
+import { createPortal } from 'react-dom';
 import { useEffect, type ReactNode } from 'react';
 import {
   AlertCircle,
   CheckCircle2,
-  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Info,
@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { useToastStore } from '../store/toastStore';
 import {
-  gradientFor,
+  gradientIndexFor,
   initials,
   NATURE,
   SITUATION_COPIEUR,
@@ -32,22 +32,14 @@ import type {
 /* ------------------------------------------------------------------ */
 export function LogoMark({ size = 36 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true">
-      <defs>
-        <linearGradient id="bt-logo" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#a5b4fc" />
-          <stop offset="1" stopColor="#4f46e5" />
-        </linearGradient>
-      </defs>
-      <rect width="64" height="64" rx="16" fill="url(#bt-logo)" />
-      <path
-        d="M20 17h17a9 9 0 0 1 3.4 17.3A9.5 9.5 0 0 1 38 52H20z"
-        fill="none"
-        stroke="#fff"
-        strokeWidth="5"
-        strokeLinejoin="round"
-      />
-      <path d="M20 34h18" stroke="#fff" strokeWidth="5" strokeLinecap="round" />
+    <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true" className="sidebar-logo-mark flex-shrink-0">
+      <rect width="64" height="64" rx="12" fill="#CC1416" />
+      {/* Point rouge signature BURINFORT — au-dessus du i */}
+      <circle cx="40" cy="10" r="5" fill="#fff" opacity="0.95" />
+      {/* Lettres BF bold */}
+      <text x="8" y="46" fontFamily="Arial Black, sans-serif" fontWeight="900" fontSize="28" fill="#fff" letterSpacing="-1">BF</text>
+      {/* Barre rouge de soulignement */}
+      <rect x="8" y="52" width="48" height="4" rx="2" fill="rgba(255,255,255,0.5)" />
     </svg>
   );
 }
@@ -65,12 +57,12 @@ export function PageHeader({
   actions?: ReactNode;
 }) {
   return (
-    <div className="flex flex-wrap items-end justify-between gap-4 animate-slide-up">
+    <div className="page-header">
       <div>
-        <h1 className="text-2xl font-bold text-ink-900 sm:text-3xl">{title}</h1>
-        {subtitle && <p className="mt-1 text-sm text-ink-500">{subtitle}</p>}
+        <h1>{title}</h1>
+        {subtitle && <p className="page-subtitle">{subtitle}</p>}
       </div>
-      {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
+      {actions && <div className="page-actions">{actions}</div>}
     </div>
   );
 }
@@ -90,8 +82,13 @@ export function Badge({
   className?: string;
 }) {
   return (
-    <span className={`badge ${TONE[tone].badge} ${className}`}>
-      {dot && <span className={`h-1.5 w-1.5 rounded-full ${TONE[tone].dot}`} />}
+    <span className={`badge ${TONE[tone].badge} d-inline-flex align-items-center gap-1 ${className}`} style={{ fontWeight: 600, letterSpacing: '0.02em' }}>
+      {dot && (
+        <span
+          className={`rounded-circle flex-shrink-0 ${TONE[tone].dot}`}
+          style={{ width: 6, height: 6, display: 'inline-block' }}
+        />
+      )}
       {children}
     </span>
   );
@@ -99,20 +96,12 @@ export function Badge({
 
 export const InterventionBadge = ({ statut }: { statut: StatutIntervention }) => {
   const s = STATUT_INTERVENTION[statut];
-  return (
-    <Badge tone={s.tone} dot>
-      {s.label}
-    </Badge>
-  );
+  return <Badge tone={s.tone} dot>{s.label}</Badge>;
 };
 
 export const SituationBadge = ({ situation }: { situation: StatutCopieur }) => {
   const s = SITUATION_COPIEUR[situation];
-  return (
-    <Badge tone={s.tone} dot>
-      {s.label}
-    </Badge>
-  );
+  return <Badge tone={s.tone} dot>{s.label}</Badge>;
 };
 
 export const ContratBadge = ({ statut }: { statut: StatutContrat }) => {
@@ -131,16 +120,17 @@ export const NatureBadge = ({ nature }: { nature: NatureIntervention }) => {
 export function Avatar({
   name,
   size = 40,
-  rounded = 'rounded-xl',
+  rounded = 'rounded-2',
 }: {
   name: string;
   size?: number;
   rounded?: string;
 }) {
+  const idx = gradientIndexFor(name);
   return (
     <div
-      className={`flex shrink-0 items-center justify-center bg-gradient-to-br font-display font-bold text-white shadow-soft ${gradientFor(name)} ${rounded}`}
-      style={{ width: size, height: size, fontSize: size * 0.36 }}
+      className={`bt-avatar av-${idx} ${rounded} flex-shrink-0`}
+      style={{ width: size, height: size, fontSize: Math.round(size * 0.36) }}
       aria-hidden="true"
     >
       {initials(name)}
@@ -149,17 +139,17 @@ export function Avatar({
 }
 
 /* ------------------------------------------------------------------ */
-/*  Chargement / états vides                                           */
+/*  Loading / empty states                                             */
 /* ------------------------------------------------------------------ */
-export function Skeleton({ className = '' }: { className?: string }) {
-  return <div className={`skeleton ${className}`} />;
+export function Skeleton({ className = '', style }: { className?: string; style?: React.CSSProperties }) {
+  return <div className={`skeleton ${className}`} style={style} />;
 }
 
 export function Spinner({ size = 20 }: { size?: number }) {
   return (
     <span
-      className="inline-block animate-spin rounded-full border-2 border-brand-200 border-t-brand-600"
-      style={{ width: size, height: size }}
+      className="spinner-border flex-shrink-0"
+      style={{ width: size, height: size, borderWidth: 2 }}
       role="status"
       aria-label="Chargement"
     />
@@ -178,25 +168,27 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-ink-200 bg-white/60 px-6 py-16 text-center animate-fade-in">
-      <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-50 text-brand-600">
-        {icon}
-      </div>
-      <h3 className="text-base font-semibold text-ink-900">{title}</h3>
-      {text && <p className="mt-1 max-w-sm text-sm text-ink-500">{text}</p>}
-      {action && <div className="mt-5">{action}</div>}
+    <div className="empty-state animate-fade-in">
+      <div className="empty-icon">{icon}</div>
+      <h3>{title}</h3>
+      {text && <p className="mt-1">{text}</p>}
+      {action && <div className="mt-4">{action}</div>}
     </div>
   );
 }
 
 export function ErrorState({ message, onRetry }: { message?: string; onRetry?: () => void }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-rose-200 bg-rose-50/60 px-6 py-12 text-center">
-      <AlertCircle className="mb-3 text-rose-500" size={28} />
-      <p className="text-sm font-semibold text-rose-700">{message ?? 'Impossible de charger les données.'}</p>
-      <p className="mt-1 text-xs text-rose-600/80">Vérifiez que l'API est démarrée puis réessayez.</p>
+    <div className="error-state">
+      <AlertCircle className="mb-3 text-danger" size={28} />
+      <p className="fw-semibold text-danger mb-1" style={{ fontSize: '0.9rem' }}>
+        {message ?? 'Impossible de charger les données.'}
+      </p>
+      <p className="text-muted" style={{ fontSize: '0.8rem' }}>
+        Vérifiez que l'API est démarrée puis réessayez.
+      </p>
       {onRetry && (
-        <button onClick={onRetry} className="btn-secondary btn-sm mt-4">
+        <button onClick={onRetry} className="btn btn-sm btn-outline-secondary mt-3">
           Réessayer
         </button>
       )}
@@ -205,7 +197,7 @@ export function ErrorState({ message, onRetry }: { message?: string; onRetry?: (
 }
 
 /* ------------------------------------------------------------------ */
-/*  Champs                                                             */
+/*  Form helpers                                                       */
 /* ------------------------------------------------------------------ */
 export function SearchInput({
   value,
@@ -219,23 +211,26 @@ export function SearchInput({
   className?: string;
 }) {
   return (
-    <div className={`relative ${className}`}>
-      <Search size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-400" />
+    <div className={`input-group ${className}`}>
+      <span className="input-group-text bg-white border-end-0">
+        <Search size={15} className="text-muted" />
+      </span>
       <input
         type="search"
-        className="input pl-10 pr-9"
+        className="form-control border-start-0 ps-0"
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        style={{ boxShadow: 'none' }}
       />
       {value && (
         <button
           type="button"
+          className="btn btn-sm btn-outline-secondary border-start-0"
           onClick={() => onChange('')}
-          className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md p-1 text-ink-400 hover:bg-ink-100 hover:text-ink-700"
-          aria-label="Effacer la recherche"
+          aria-label="Effacer"
         >
-          <X size={14} />
+          <X size={13} />
         </button>
       )}
     </div>
@@ -258,29 +253,45 @@ export function Field({
   children: ReactNode;
 }) {
   return (
-    <div className={className}>
-      <label className="label">
+    <div className={`mb-3 ${className}`}>
+      <label className="form-label">
         {label}
-        {required && <span className="ml-0.5 text-rose-500">*</span>}
+        {required && <span className="text-danger ms-1">*</span>}
       </label>
       {children}
       {error ? (
-        <p className="mt-1 text-xs font-medium text-rose-600">{error}</p>
+        <div className="invalid-feedback d-block">{error}</div>
       ) : (
-        hint && <p className="mt-1 text-xs text-ink-400">{hint}</p>
+        hint && <div className="form-text">{hint}</div>
       )}
     </div>
   );
 }
 
-/** Conteneur de <select> natif avec chevron. */
-export function SelectBox({ children, className = '' }: { children: ReactNode; className?: string }) {
+export function FormSection({
+  icon,
+  title,
+  children,
+  className = '',
+}: {
+  icon?: ReactNode;
+  title: string;
+  children: ReactNode;
+  className?: string;
+}) {
   return (
-    <div className={`relative ${className}`}>
+    <div className={`form-section ${className}`}>
+      <div className="form-section-title d-flex align-items-center gap-2">
+        {icon && <span style={{ opacity: 0.7, display: 'flex' }}>{icon}</span>}
+        {title}
+      </div>
       {children}
-      <ChevronDown size={16} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-ink-400" />
     </div>
   );
+}
+
+export function SelectBox({ children, className = '' }: { children: ReactNode; className?: string }) {
+  return <div className={className}>{children}</div>;
 }
 
 export function Segmented<T extends string>({
@@ -293,16 +304,14 @@ export function Segmented<T extends string>({
   options: { value: T; label: ReactNode; title?: string }[];
 }) {
   return (
-    <div className="inline-flex rounded-xl border border-ink-200 bg-white p-1 shadow-soft">
+    <div className="bt-segmented">
       {options.map((o) => (
         <button
           key={o.value}
           type="button"
           title={o.title}
           onClick={() => onChange(o.value)}
-          className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
-            value === o.value ? 'bg-brand-600 text-white shadow-soft' : 'text-ink-500 hover:text-ink-900'
-          }`}
+          className={value === o.value ? 'active' : ''}
         >
           {o.label}
         </button>
@@ -312,18 +321,27 @@ export function Segmented<T extends string>({
 }
 
 export function ProgressBar({ value, tone = 'brand' }: { value: number; tone?: Tone }) {
+  const colors: Record<Tone, string> = {
+    brand:   '#CC1416',
+    emerald: '#10b981',
+    amber:   '#f59e0b',
+    rose:    '#ef4444',
+    sky:     '#0ea5e9',
+    violet:  '#8b5cf6',
+    slate:   '#94a3b8',
+  };
   return (
-    <div className="h-1.5 w-full overflow-hidden rounded-full bg-ink-100">
+    <div className="bt-progress">
       <div
-        className={`h-full origin-left rounded-full animate-grow-x ${TONE[tone].dot}`}
-        style={{ width: `${Math.max(2, Math.min(100, value))}%` }}
+        className="bt-progress-bar animate-grow-x"
+        style={{ width: `${Math.max(2, Math.min(100, value))}%`, background: colors[tone] }}
       />
     </div>
   );
 }
 
 /* ------------------------------------------------------------------ */
-/*  Modale & tiroir                                                    */
+/*  Modal & Drawer                                                     */
 /* ------------------------------------------------------------------ */
 function useEscape(open: boolean, onClose: () => void) {
   useEffect(() => {
@@ -358,26 +376,24 @@ export function Modal({
 }) {
   useEscape(open, onClose);
   if (!open) return null;
-  const width = { md: 'max-w-lg', lg: 'max-w-2xl', xl: 'max-w-4xl' }[size];
-  return (
-    <div className="fixed inset-0 z-[1000] flex items-end justify-center p-0 sm:items-center sm:p-4" role="dialog" aria-modal="true">
-      <div className="absolute inset-0 bg-ink-950/50 backdrop-blur-sm animate-fade-in" onClick={onClose} />
-      <div
-        className={`relative flex max-h-[94vh] w-full flex-col overflow-hidden rounded-t-3xl bg-white shadow-2xl animate-pop-in sm:rounded-3xl ${width}`}
-      >
-        <div className="flex items-start justify-between gap-4 border-b border-ink-100 px-6 py-5">
+  const sizeClass = { md: 'bt-modal-md', lg: 'bt-modal-lg', xl: 'bt-modal-xl' }[size];
+  return createPortal(
+    <div className="bt-modal-backdrop" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className={`bt-modal ${sizeClass}`}>
+        <div className="bt-modal-header">
           <div>
-            <h2 className="text-lg font-bold text-ink-900">{title}</h2>
-            {subtitle && <p className="mt-0.5 text-sm text-ink-500">{subtitle}</p>}
+            <h2>{title}</h2>
+            {subtitle && <div className="bt-modal-subtitle">{subtitle}</div>}
           </div>
-          <button onClick={onClose} className="btn-icon -mr-2 -mt-1" aria-label="Fermer">
+          <button onClick={onClose} className="btn-icon" aria-label="Fermer">
             <X size={18} />
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto px-6 py-5">{children}</div>
-        {footer && <div className="flex items-center justify-end gap-3 border-t border-ink-100 bg-ink-50/60 px-6 py-4">{footer}</div>}
+        <div className="bt-modal-body">{children}</div>
+        {footer && <div className="bt-modal-footer">{footer}</div>}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -398,27 +414,28 @@ export function Drawer({
 }) {
   useEscape(open, onClose);
   if (!open) return null;
-  return (
-    <div className="fixed inset-0 z-[1000]" role="dialog" aria-modal="true">
-      <div className="absolute inset-0 bg-ink-950/40 backdrop-blur-[2px] animate-fade-in" onClick={onClose} />
-      <aside className="absolute inset-y-0 right-0 flex w-full max-w-xl flex-col bg-white shadow-2xl animate-slide-in-right">
-        <div className="flex items-start justify-between gap-4 border-b border-ink-100 px-6 py-5">
-          <div className="min-w-0">
-            <h2 className="truncate text-lg font-bold text-ink-900">{title}</h2>
-            {subtitle && <div className="mt-0.5 text-sm text-ink-500">{subtitle}</div>}
+  return createPortal(
+    <>
+      <div className="bt-drawer-backdrop" onClick={onClose} />
+      <aside className="bt-drawer">
+        <div className="bt-drawer-header">
+          <div style={{ minWidth: 0 }}>
+            <h2>{title}</h2>
+            {subtitle && <div className="text-muted mt-1" style={{ fontSize: '0.8rem' }}>{subtitle}</div>}
           </div>
-          <button onClick={onClose} className="btn-icon -mr-2 -mt-1 shrink-0" aria-label="Fermer">
+          <button onClick={onClose} className="btn-icon flex-shrink-0" aria-label="Fermer">
             <X size={18} />
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto px-6 py-5">{children}</div>
-        {footer && <div className="border-t border-ink-100 bg-ink-50/60 px-6 py-4">{footer}</div>}
+        <div className="bt-drawer-body">{children}</div>
+        {footer && <div className="bt-drawer-footer">{footer}</div>}
       </aside>
-    </div>
+    </>,
+    document.body
   );
 }
 
-/** Ligne "libellé / valeur" pour les panneaux de détail. */
+/** Ligne libellé / valeur dans les tiroirs de détail */
 export function DetailRow({
   icon,
   label,
@@ -429,11 +446,11 @@ export function DetailRow({
   children: ReactNode;
 }) {
   return (
-    <div className="flex items-start gap-3 py-2.5">
-      {icon && <div className="mt-0.5 text-ink-400">{icon}</div>}
-      <div className="min-w-0 flex-1">
-        <p className="text-[11px] font-semibold uppercase tracking-wide text-ink-400">{label}</p>
-        <div className="mt-0.5 break-words text-sm text-ink-800">{children}</div>
+    <div className="detail-row">
+      {icon && <div className="detail-icon">{icon}</div>}
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <div className="detail-label">{label}</div>
+        <div className="detail-value">{children}</div>
       </div>
     </div>
   );
@@ -454,15 +471,23 @@ export function Pagination({
   count: number;
 }) {
   return (
-    <div className="flex items-center justify-between border-t border-ink-100 bg-ink-50/50 px-5 py-3">
-      <p className="text-xs font-medium text-ink-500">
+    <div className="d-flex align-items-center justify-content-between px-3 py-2 border-top bg-light" style={{ fontSize: '0.8rem' }}>
+      <span className="text-muted">
         {count} résultat{count > 1 ? 's' : ''} · page {page}
-      </p>
-      <div className="flex gap-2">
-        <button className="btn-secondary btn-sm" disabled={page === 1} onClick={() => onPage(page - 1)}>
+      </span>
+      <div className="d-flex gap-2">
+        <button
+          className="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1"
+          disabled={page === 1}
+          onClick={() => onPage(page - 1)}
+        >
           <ChevronLeft size={14} /> Précédent
         </button>
-        <button className="btn-secondary btn-sm" disabled={!hasNext} onClick={() => onPage(page + 1)}>
+        <button
+          className="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1"
+          disabled={!hasNext}
+          onClick={() => onPage(page + 1)}
+        >
           Suivant <ChevronRight size={14} />
         </button>
       </div>
@@ -476,23 +501,20 @@ export function Pagination({
 export function Toaster() {
   const { toasts, dismiss } = useToastStore();
   const icons = {
-    success: <CheckCircle2 size={18} className="text-emerald-500" />,
-    error: <AlertCircle size={18} className="text-rose-500" />,
-    info: <Info size={18} className="text-brand-500" />,
+    success: <CheckCircle2 size={18} className="text-success flex-shrink-0" />,
+    error:   <AlertCircle  size={18} className="text-danger flex-shrink-0"  />,
+    info:    <Info         size={18} className="text-primary flex-shrink-0" />,
   };
   return (
-    <div className="pointer-events-none fixed bottom-4 right-4 z-[2000] flex w-[min(24rem,calc(100vw-2rem))] flex-col gap-2">
+    <div className="bt-toast-container">
       {toasts.map((t) => (
-        <div
-          key={t.id}
-          className="pointer-events-auto flex items-start gap-3 rounded-2xl border border-ink-100 bg-white p-4 shadow-lift animate-pop-in"
-        >
-          <div className="mt-0.5">{icons[t.kind]}</div>
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-ink-900">{t.title}</p>
-            {t.description && <p className="mt-0.5 text-xs text-ink-500">{t.description}</p>}
+        <div key={t.id} className="bt-toast">
+          <div className="mt-1">{icons[t.kind]}</div>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div className="bt-toast-title">{t.title}</div>
+            {t.description && <div className="bt-toast-desc">{t.description}</div>}
           </div>
-          <button onClick={() => dismiss(t.id)} className="text-ink-400 hover:text-ink-700" aria-label="Fermer">
+          <button onClick={() => dismiss(t.id)} className="btn-icon" aria-label="Fermer" style={{ marginTop: '-2px' }}>
             <X size={14} />
           </button>
         </div>

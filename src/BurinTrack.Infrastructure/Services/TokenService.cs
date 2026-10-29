@@ -37,13 +37,14 @@ public class TokenService : ITokenService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public string GenererRefreshToken()
-        => Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+    // Embed userId in token to avoid O(N) user scan on refresh
+    public string GenererRefreshToken(string userId)
+    {
+        var randomBytes = RandomNumberGenerator.GetBytes(64);
+        var payload = $"{userId}:{Convert.ToBase64String(randomBytes)}";
+        return Convert.ToBase64String(Encoding.UTF8.GetBytes(payload));
+    }
 
     public (string userId, string email)? ValiderRefreshToken(string token)
-    {
-        // Le refresh token est stocké en BDD avec une expiration de 7 jours
-        // Cette méthode est appelée après validation en BDD
-        return null;
-    }
+        => null; // Validation handled in AuthController via DB lookup
 }

@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace BurinTrack.Application.DTOs;
 
 public record TechnicienDto(
@@ -14,8 +16,8 @@ public record TechnicienDto(
 );
 
 public record CreateTechnicienDto(
-    string Nom,
-    string Prenom,
-    string Telephone,
-    string Email
+    [Required, StringLength(100)] string Nom,
+    [Required, StringLength(100)] string Prenom,
+    [Required, StringLength(30)] string Telephone,
+    [Required, EmailAddress, StringLength(200)] string Email
 );

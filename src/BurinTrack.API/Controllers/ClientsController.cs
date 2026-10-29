@@ -1,6 +1,7 @@
 using BurinTrack.Application.DTOs;
 using BurinTrack.Application.Interfaces;
 using BurinTrack.Domain.Entities;
+using BurinTrack.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -54,6 +55,7 @@ public class ClientsController : ControllerBase
             FonctionContact = dto.FonctionContact,
             Telephone = dto.Telephone,
             Email = dto.Email,
+            TypeFacturation = dto.TypeFacturation,
             ForfaitMensuelHT = dto.ForfaitMensuelHT,
             ForfaitCopieMono = dto.ForfaitCopieMono,
             ForfaitCopieCouleur = dto.ForfaitCopieCouleur,
@@ -88,6 +90,7 @@ public class ClientsController : ControllerBase
         client.Telephone = dto.Telephone;
         client.Email = dto.Email;
         client.EstActif = dto.EstActif;
+        client.TypeFacturation = dto.TypeFacturation;
         client.ForfaitMensuelHT = dto.ForfaitMensuelHT;
         client.ForfaitCopieMono = dto.ForfaitCopieMono;
         client.ForfaitCopieCouleur = dto.ForfaitCopieCouleur;
@@ -117,7 +120,7 @@ public class ClientsController : ControllerBase
         c.Id, c.NomClient, c.RaisonSociale, c.NumeroContrat, c.SecteurActivite,
         c.Adresse, c.Ville, c.Commune, c.Pays, c.Latitude, c.Longitude,
         c.NomContact, c.FonctionContact, c.Telephone, c.Email,
-        c.EstActif,
+        c.EstActif, c.TypeFacturation,
         c.ForfaitMensuelHT, c.ForfaitCopieMono, c.ForfaitCopieCouleur,
         c.PrixCopieSupMono, c.PrixCopieSupCouleur, c.TauxTVA,
         c.Copieurs.Count, c.CreatedAt);

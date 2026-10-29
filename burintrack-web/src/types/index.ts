@@ -1,4 +1,5 @@
 export type StatutIntervention = 'Ouverte' | 'EnCours' | 'Resolue' | 'Fermee';
+export type TypeFacturation = 'Aucune' | 'Forfait';
 export type StatutCopieur = 'Actif' | 'EnMaintenance' | 'Remplace' | 'HorsService';
 export type StatutContrat = 'Actif' | 'Expire' | 'Suspendu' | 'Resilie';
 export type NatureIntervention =
@@ -27,6 +28,13 @@ export interface Client {
   telephone: string;
   email: string;
   estActif: boolean;
+  typeFacturation: TypeFacturation;
+  forfaitMensuelHT: number;
+  forfaitCopieMono: number;
+  forfaitCopieCouleur: number;
+  prixCopieSupMono: number;
+  prixCopieSupCouleur: number;
+  tauxTVA: number;
   nombreCopieurs: number;
   createdAt: string;
 }
