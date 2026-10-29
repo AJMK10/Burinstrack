@@ -144,6 +144,15 @@ export interface FactureMensuelle {
   details: DetailCopieurFacture[];
 }
 
+export interface Notification {
+  id: string;
+  titre: string;
+  message: string;
+  isRead: boolean;
+  lien: string | null;
+  createdAt: string;
+}
+
 export interface AppUser {
   id: string;
   email: string;

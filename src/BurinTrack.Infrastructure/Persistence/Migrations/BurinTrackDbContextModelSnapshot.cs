@@ -390,6 +390,41 @@ namespace BurinTrack.Infrastructure.Persistence.Migrations
                     b.ToTable("Interventions");
                 });
 
+            modelBuilder.Entity("BurinTrack.Domain.Entities.Notification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Lien")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Titre")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Notifications");
+                });
+
             modelBuilder.Entity("BurinTrack.Domain.Entities.Parametre", b =>
                 {
                     b.Property<string>("Cle")
@@ -411,7 +446,7 @@ namespace BurinTrack.Infrastructure.Persistence.Migrations
                         {
                             Cle = "entreprise",
                             UpdatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Valeur = "{\"nomSociete\":\"BURINFORT\",\"adresse\":\"\",\"telephone\":\"\",\"email\":\"\",\"siteWeb\":\"\"}"
+                            Valeur = "{\"nomSociete\":\"BURINFORT\",\"nomApplication\":\"BurinTrack\",\"adresse\":\"\",\"telephone\":\"\",\"email\":\"\",\"siteWeb\":\"\",\"logoBase64\":\"\"}"
                         },
                         new
                         {

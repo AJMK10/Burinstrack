@@ -2,9 +2,12 @@ using System.Security.Cryptography;
 using System.Text;
 using BurinTrack.Application.DTOs;
 using BurinTrack.Application.Interfaces;
+using BurinTrack.Domain.Entities;
+using BurinTrack.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BurinTrack.API.Controllers;
 
@@ -18,13 +21,16 @@ public class AuthController : ControllerBase
     private readonly UserManager<IdentityUser> _userManager;
     private readonly SignInManager<IdentityUser> _signInManager;
     private readonly ITokenService _tokenService;
+    private readonly BurinTrackDbContext _db;
 
     public AuthController(UserManager<IdentityUser> userManager,
-        SignInManager<IdentityUser> signInManager, ITokenService tokenService)
+        SignInManager<IdentityUser> signInManager, ITokenService tokenService,
+        BurinTrackDbContext db)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _tokenService = tokenService;
+        _db = db;
     }
 
     [HttpPost("login")]
@@ -114,12 +120,27 @@ public class AuthController : ControllerBase
         if (!AllowedRoles.Contains(dto.Role))
             return BadRequest($"Role invalide. Roles autorisés: {string.Join(", ", AllowedRoles)}");
 
-        var user = new IdentityUser { Email = dto.Email, UserName = $"{dto.Prenom} {dto.Nom}".Trim() };
+        var user = new IdentityUser { Email = dto.Email, UserName = $"{dto.Prenom} {dto.Nom}".Trim(), EmailConfirmed = true };
         var result = await _userManager.CreateAsync(user, dto.MotDePasse);
         if (!result.Succeeded)
             return BadRequest(string.Join(" ", result.Errors.Select(e => e.Description)));
 
         await _userManager.AddToRoleAsync(user, dto.Role);
+
+        if (dto.Role == "Technicien" && !await _db.Techniciens.AnyAsync(t => t.Email == dto.Email))
+        {
+            _db.Techniciens.Add(new Technicien
+            {
+                UserId = user.Id,
+                Nom = dto.Nom,
+                Prenom = dto.Prenom,
+                Telephone = dto.Telephone,
+                Email = dto.Email,
+                EstActif = true
+            });
+            await _db.SaveChangesAsync();
+        }
+
         return Created($"/api/auth/users/{user.Id}", new { user.Id, user.Email });
     }
 

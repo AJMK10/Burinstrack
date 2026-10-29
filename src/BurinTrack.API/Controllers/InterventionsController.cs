@@ -2,8 +2,10 @@ using BurinTrack.Application.DTOs;
 using BurinTrack.Application.Interfaces;
 using BurinTrack.Domain.Entities;
 using BurinTrack.Domain.Enums;
+using BurinTrack.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BurinTrack.API.Controllers;
 
@@ -13,8 +15,13 @@ namespace BurinTrack.API.Controllers;
 public class InterventionsController : ControllerBase
 {
     private readonly IUnitOfWork _uow;
+    private readonly BurinTrackDbContext _db;
 
-    public InterventionsController(IUnitOfWork uow) => _uow = uow;
+    public InterventionsController(IUnitOfWork uow, BurinTrackDbContext db)
+    {
+        _uow = uow;
+        _db = db;
+    }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<InterventionDto>>> Search(
@@ -71,6 +78,21 @@ public class InterventionsController : ControllerBase
 
         await _uow.Interventions.AddAsync(intervention, ct);
         await _uow.SaveChangesAsync(ct);
+
+        // Notifier le technicien assigné
+        var tech = await _db.Techniciens.AsNoTracking()
+            .FirstOrDefaultAsync(t => t.Id == dto.TechnicienId, ct);
+        if (tech is not null && !string.IsNullOrEmpty(tech.UserId))
+        {
+            _db.Notifications.Add(new Notification
+            {
+                UserId = tech.UserId,
+                Titre = "Nouvelle intervention assignée",
+                Message = $"Intervention {numero} prévue le {dto.DateIntervention:dd/MM/yyyy}.",
+                Lien = $"/interventions/{intervention.Id}"
+            });
+            await _db.SaveChangesAsync(ct);
+        }
 
         var created = await _uow.Interventions.GetDetailAsync(intervention.Id, ct);
         return CreatedAtAction(nameof(GetById), new { id = intervention.Id }, MapToDto(created!));

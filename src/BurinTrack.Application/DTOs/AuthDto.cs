@@ -51,3 +51,12 @@ public record UpdateProfileDto(
     [Required, StringLength(200)] string NomComplet,
     [Required, EmailAddress, StringLength(256)] string Email
 );
+
+public record NotificationDto(
+    Guid Id,
+    string Titre,
+    string Message,
+    bool IsRead,
+    string? Lien,
+    DateTime CreatedAt
+);

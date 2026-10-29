@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import api from '../../lib/api';
-import type { Dashboard } from '../../types';
+import type { Dashboard, Notification } from '../../types';
 import { Toaster, LogoMark, Avatar } from '../ui';
 
 type NavItem = { to: string; icon: React.ElementType; label: string; end?: boolean; roles?: string[] };
@@ -106,6 +106,14 @@ export default function AdminLayout() {
     queryFn: () => api.get('/dashboard').then((r) => r.data),
   });
 
+  const { data: notifications = [], refetch: refetchNotifs } = useQuery<Notification[]>({
+    queryKey: ['notifications'],
+    queryFn: () => api.get('/notifications').then((r) => r.data),
+    refetchInterval: 30000,
+  });
+
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
+
   const { data: entreprise } = useQuery<{ nomSociete: string; nomApplication: string; logoBase64: string }>({
     queryKey: ['parametres-entreprise'],
     queryFn: async () => {
@@ -140,6 +148,16 @@ export default function AdminLayout() {
   };
 
   const alertCount = (dash?.contratsExpirant30 ?? 0) + (dash?.interventionsOuvertes ?? 0);
+  const totalBellCount = unreadCount + alertCount;
+
+  const handleBellOpen = async () => {
+    setBellOpen((v) => !v);
+    setMenuOpen(false);
+    if (unreadCount > 0) {
+      await api.put('/notifications/read-all').catch(() => {});
+      refetchNotifs();
+    }
+  };
   const displayName = user?.nomComplet || user?.email || 'Utilisateur';
   const userRole = user?.roles?.[0] ?? '';
   const role = ROLE_LABELS[userRole] ?? userRole;
@@ -257,15 +275,43 @@ export default function AdminLayout() {
             <div className="topbar-action-wrap position-relative">
               <button
                 className="topbar-action-btn"
-                onClick={() => { setBellOpen((v) => !v); setMenuOpen(false); }}
+                onClick={handleBellOpen}
                 aria-label="Notifications"
               >
                 <Bell size={18} />
-                {alertCount > 0 && <span className="topbar-badge">{alertCount > 9 ? '9+' : alertCount}</span>}
+                {totalBellCount > 0 && <span className="topbar-badge">{totalBellCount > 9 ? '9+' : totalBellCount}</span>}
               </button>
 
               {bellOpen && (
                 <div className="topbar-dropdown topbar-dropdown-alerts animate-pop-in">
+                  {/* Notifications personnelles */}
+                  {notifications.length > 0 && (
+                    <>
+                      <div className="topbar-dropdown-header">
+                        <span>Notifications</span>
+                        {unreadCount > 0 && <span className="badge badge-brand">{unreadCount}</span>}
+                      </div>
+                      {notifications.slice(0, 5).map((n) => (
+                        <Link
+                          key={n.id}
+                          to={n.lien ?? '/interventions'}
+                          onClick={() => setBellOpen(false)}
+                          className="topbar-dropdown-item"
+                          style={{ opacity: n.isRead ? 0.6 : 1 }}
+                        >
+                          <span className="topbar-dropdown-icon" style={{ background: '#eff6ff', color: '#1d4ed8' }}>
+                            <Wrench size={14} />
+                          </span>
+                          <span>
+                            <div className="topbar-dropdown-item-title">{n.titre}</div>
+                            <div className="topbar-dropdown-item-sub">{n.message}</div>
+                          </span>
+                        </Link>
+                      ))}
+                    </>
+                  )}
+
+                  {/* Alertes système */}
                   <div className="topbar-dropdown-header">
                     <span>Alertes</span>
                     {alertCount > 0 && <span className="badge badge-brand">{alertCount}</span>}
