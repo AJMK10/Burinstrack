@@ -1,5 +1,5 @@
 using Npgsql;
-const string connStr = "Host=aws-0-eu-west-1.pooler.supabase.com;Port=5432;Database=postgres;Username=postgres.dqvrfoaseimnlhgemslf;Password=Burintrack@123;SSL Mode=Require;Trust Server Certificate=true";
+const string connStr = "Host=localhost;Port=5432;Database=burintrack;Username=burintrack;Password=burintrack_dev";
 await using var conn = new NpgsqlConnection(connStr);
 await conn.OpenAsync();
 await using var cmd = new NpgsqlCommand(

@@ -39,6 +39,9 @@ public static class DatabaseSeeder
             var result = await userManager.CreateAsync(admin, adminPassword);
             if (result.Succeeded)
                 await userManager.AddToRoleAsync(admin, "Administrateur");
+            else
+                throw new InvalidOperationException(
+                    $"Création admin échouée: {string.Join(", ", result.Errors.Select(e => e.Description))}");
         }
     }
 }

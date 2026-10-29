@@ -29,7 +29,7 @@ public static class DependencyInjection
                 opts.Lockout.MaxFailedAccessAttempts = 5;
                 opts.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
                 opts.User.AllowedUserNameCharacters =
-                    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 -_.'àâäéèêëîïôùûüçÀÂÄÉÈÊËÎÏÔÙÛÜÇ";
+                    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 -_.'@àâäéèêëîïôùûüçÀÂÄÉÈÊËÎÏÔÙÛÜÇ";
             })
             .AddEntityFrameworkStores<BurinTrackDbContext>()
             .AddDefaultTokenProviders();
