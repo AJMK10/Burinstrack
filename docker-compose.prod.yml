@@ -1,0 +1,39 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: burintrack-db
+    restart: always
+    environment:
+      POSTGRES_DB: burintrack
+      POSTGRES_USER: burintrack
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - burintrack
+
+  api:
+    image: burintrack-api
+    container_name: burintrack-api
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "10000:10000"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://0.0.0.0:10000
+      ConnectionStrings__DefaultConnection: "Host=db;Port=5432;Database=burintrack;Username=burintrack;Password=${DB_PASSWORD}"
+      Jwt__Secret: ${JWT_SECRET}
+      Jwt__Issuer: burintrack-api
+      Jwt__Audience: burintrack-web
+      AllowedOrigins: ${ALLOWED_ORIGINS}
+      ADMIN_INITIAL_PASSWORD: ${ADMIN_PASSWORD}
+    networks:
+      - burintrack
+
+networks:
+  burintrack:
+
+volumes:
+  pgdata:
