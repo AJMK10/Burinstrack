@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { ArrowLeft, ArrowLeftRight, Save } from 'lucide-react';
 import api from '../lib/api';
-import type { Client, Copieur, StatutContrat } from '../types/index';
+import type { Client, Copieur } from '../types/index';
 import { toast } from '../store/toastStore';
 import { MARQUE_TONE, TONE } from '../lib/format';
 import { ContratBadge, Skeleton } from '../components/ui';

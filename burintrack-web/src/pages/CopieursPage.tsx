@@ -12,7 +12,6 @@ import type { Copieur, StatutCopieur } from '../types';
 import { useAuthStore } from '../store/authStore';
 import { formatDate, MARQUE_TONE, TONE } from '../lib/format';
 import {
-  ContratBadge,
   EmptyState,
   ErrorState,
   PageHeader,

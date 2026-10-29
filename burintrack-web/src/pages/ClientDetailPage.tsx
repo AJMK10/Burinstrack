@@ -16,7 +16,6 @@ import type { Client, Copieur } from '../types';
 import { useAuthStore } from '../store/authStore';
 import { formatDate, MARQUE_TONE, TONE } from '../lib/format';
 import {
-  Avatar,
   Badge,
   DetailRow,
   ErrorState,

@@ -1,13 +1,12 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { AlertTriangle, ArrowLeftRight, Pencil, Printer } from 'lucide-react';
+import { AlertTriangle, ArrowLeftRight, Printer } from 'lucide-react';
 import api from '../lib/api';
 import type { Copieur } from '../types/index';
 import { useAuthStore } from '../store/authStore';
 import { formatDate, MARQUE_TONE, TONE } from '../lib/format';
 import {
-  ContratBadge,
   EmptyState,
   ErrorState,
   PageHeader,
