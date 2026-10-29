@@ -28,9 +28,11 @@ builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection(
 builder.Services.AddInMemoryRateLimiting();
 builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 
+var allowedOrigins = (builder.Configuration["AllowedOrigins"] ?? "http://localhost:5173")
+    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 builder.Services.AddCors(opts =>
     opts.AddPolicy("WebPolicy", p => p
-        .WithOrigins(builder.Configuration["AllowedOrigins"] ?? "http://localhost:5173")
+        .WithOrigins(allowedOrigins)
         .AllowAnyMethod()
         .AllowAnyHeader()
         .AllowCredentials()));
@@ -51,6 +53,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<AuditMiddleware>();
 app.MapControllers();
+app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
 
 // Seeder avec retry — tolère une base temporairement inaccessible au démarrage
 var seederLogger = app.Services.GetRequiredService<ILogger<Program>>();
