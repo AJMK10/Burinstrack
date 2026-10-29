@@ -1,4 +1,6 @@
 using BurinTrack.Application.DTOs;
+using BurinTrack.Domain.Entities;
+using BurinTrack.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -15,9 +17,13 @@ public class UsersController : ControllerBase
         ["Administrateur", "ResponsableSAV", "Technicien", "Consultation"];
 
     private readonly UserManager<IdentityUser> _userManager;
+    private readonly BurinTrackDbContext _db;
 
-    public UsersController(UserManager<IdentityUser> userManager)
-        => _userManager = userManager;
+    public UsersController(UserManager<IdentityUser> userManager, BurinTrackDbContext db)
+    {
+        _userManager = userManager;
+        _db = db;
+    }
 
     [HttpGet]
     [Authorize(Policy = "CanViewAll")]
@@ -43,6 +49,46 @@ public class UsersController : ControllerBase
         if (user is null) return NotFound();
         var roles = await _userManager.GetRolesAsync(user);
         return Ok(new UserInfoDto(user.Id, user.Email!, user.UserName!, roles));
+    }
+
+    [HttpPost]
+    [Authorize(Policy = "AdminOnly")]
+    public async Task<ActionResult<UserListDto>> CreateUser([FromBody] CreateUserDto dto)
+    {
+        if (!AllowedRoles.Contains(dto.Role))
+            return BadRequest("Role invalide.");
+
+        var user = new IdentityUser
+        {
+            UserName = $"{dto.Prenom} {dto.Nom}".Trim(),
+            Email = dto.Email,
+            EmailConfirmed = true
+        };
+        var result = await _userManager.CreateAsync(user, dto.MotDePasse);
+        if (!result.Succeeded)
+            return BadRequest(result.Errors);
+
+        await _userManager.AddToRoleAsync(user, dto.Role);
+
+        if (dto.Role == "Technicien")
+        {
+            if (!await _db.Techniciens.AnyAsync(t => t.Email == dto.Email))
+            {
+                _db.Techniciens.Add(new Technicien
+                {
+                    UserId = user.Id,
+                    Nom = dto.Nom,
+                    Prenom = dto.Prenom,
+                    Telephone = dto.Telephone,
+                    Email = dto.Email,
+                    EstActif = true
+                });
+                await _db.SaveChangesAsync();
+            }
+        }
+
+        return Created($"/api/users/{user.Id}",
+            new UserListDto(user.Id, user.Email!, user.UserName!, dto.Role, false));
     }
 
     [HttpPut("me")]
@@ -99,11 +145,15 @@ public class UsersController : ControllerBase
         if (!updateResult.Succeeded) return BadRequest(updateResult.Errors);
 
         var currentRoles = await _userManager.GetRolesAsync(user);
+        var previousRole = currentRoles.FirstOrDefault() ?? "";
         if (!currentRoles.Contains(dto.Role))
         {
             await _userManager.RemoveFromRolesAsync(user, currentRoles);
             await _userManager.AddToRoleAsync(user, dto.Role);
         }
+
+        await SyncTechnicienAsync(id, dto.NomComplet, dto.Email, dto.Role, previousRole);
+
         return NoContent();
     }
 
@@ -141,6 +191,47 @@ public class UsersController : ControllerBase
             user.LockoutEnd = DateTimeOffset.UtcNow.AddYears(99);
         }
         await _userManager.UpdateAsync(user);
+
+        var technicien = await _db.Techniciens.FirstOrDefaultAsync(t => t.UserId == id);
+        if (technicien != null)
+        {
+            technicien.EstActif = isLocked; // was locked → now active; was active → now locked
+            await _db.SaveChangesAsync();
+        }
+
         return NoContent();
+    }
+
+    private async Task SyncTechnicienAsync(string userId, string nomComplet, string email, string newRole, string previousRole)
+    {
+        var technicien = await _db.Techniciens.FirstOrDefaultAsync(t => t.UserId == userId);
+
+        if (newRole == "Technicien")
+        {
+            if (technicien == null)
+            {
+                var parts = nomComplet.Split(' ', 2);
+                _db.Techniciens.Add(new Technicien
+                {
+                    UserId = userId,
+                    Prenom = parts[0],
+                    Nom = parts.Length > 1 ? parts[1] : "",
+                    Telephone = "",
+                    Email = email,
+                    EstActif = true
+                });
+            }
+            else
+            {
+                technicien.Email = email;
+                technicien.EstActif = true;
+            }
+        }
+        else if (previousRole == "Technicien" && technicien != null)
+        {
+            technicien.EstActif = false;
+        }
+
+        await _db.SaveChangesAsync();
     }
 }
