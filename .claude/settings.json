@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:demo.adminkit.io)",
+      "Bash(powershell -Command \"Get-NetTCPConnection -LocalPort 5100 -ErrorAction SilentlyContinue | Select-Object LocalAddress, LocalPort, OwningProcess\")",
+      "Bash(powershell -Command \"Stop-Process -Id 9004 -Force\")"
+    ]
+  }
+}

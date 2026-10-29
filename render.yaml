@@ -1,0 +1,37 @@
+services:
+  - type: web
+    name: burintrack-api
+    runtime: docker
+    dockerfilePath: ./src/BurinTrack.API/Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://0.0.0.0:10000
+      - key: ConnectionStrings__DefaultConnection
+        sync: false   # à saisir dans le dashboard Render
+      - key: ConnectionStrings__Redis
+        sync: false   # Upstash Redis (optionnel)
+      - key: Jwt__Secret
+        sync: false
+      - key: Jwt__Issuer
+        value: burintrack-api
+      - key: Jwt__Audience
+        value: burintrack-web
+      - key: AllowedOrigins
+        sync: false   # ex: https://burintrack-web.vercel.app
+      - key: ADMIN_INITIAL_PASSWORD
+        sync: false
+      - key: MinIO__Endpoint
+        sync: false
+      - key: MinIO__AccessKey
+        sync: false
+      - key: MinIO__SecretKey
+        sync: false
+      - key: MinIO__BucketName
+        value: burintrack
+      - key: MinIO__Secure
+        value: "false"

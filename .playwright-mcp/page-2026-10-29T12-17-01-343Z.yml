@@ -1,0 +1,40 @@
+- generic [ref=f2e3]:
+  - generic [ref=f2e4]:
+    - generic [ref=f2e7]:
+      - img [aria-hidden] [ref=f2e8]:
+        - generic [ref=f2e11]: BF
+      - generic [ref=f2e13]:
+        - generic [ref=f2e14]: BurinTrack
+        - generic [ref=f2e15]: par BURINFORT
+    - generic [ref=f2e16]:
+      - generic [ref=f2e17]: Plateforme SAV nouvelle génération
+      - heading "Pilotez votre parc de copieurs, sans friction." [level=1] [ref=f2e21]
+      - paragraph [ref=f2e22]: Une seule plateforme pour vos contrats, vos interventions techniques et le suivi des compteurs de plus de 200 machines.
+      - generic [ref=f2e23]:
+        - generic [ref=f2e28]:
+          - generic [ref=f2e29]: Interventions tracées
+          - generic [ref=f2e30]: Du signalement à la clôture, chaque action est historisée.
+        - generic [ref=f2e36]:
+          - generic [ref=f2e37]: Compteurs & facturation
+          - generic [ref=f2e38]: Volumes noir & blanc et couleur calculés automatiquement.
+        - generic [ref=f2e44]:
+          - generic [ref=f2e45]: Parc géolocalisé
+          - generic [ref=f2e46]: Visualisez vos clients et optimisez les déplacements.
+    - paragraph [ref=f2e47]: © 2026 BURINFORT · Service Technique / SAV
+  - generic [ref=f2e49]:
+    - heading "Bon retour 👋" [level=2] [ref=f2e50]
+    - paragraph [ref=f2e51]: Connectez-vous pour accéder à votre espace de gestion SAV.
+    - generic [ref=f2e52]:
+      - generic [ref=f2e53]:
+        - generic [ref=f2e54]: Adresse e-mail
+        - textbox "Adresse e-mail" [ref=f2e60]:
+          - /placeholder: nom@burinfort.com
+      - generic [ref=f2e61]:
+        - generic [ref=f2e62]: Mot de passe
+        - generic [ref=f2e63]:
+          - textbox "Mot de passe" [ref=f2e68]:
+            - /placeholder: ••••••••
+          - button "Afficher" [ref=f2e69] [cursor=pointer]
+      - button "Se connecter" [ref=f2e73] [cursor=pointer]
+    - button "Compte de démonstration" [ref=f2e74] [cursor=pointer]
+    - paragraph [ref=f2e78]: Application interne BURINFORT · Connexion sécurisée

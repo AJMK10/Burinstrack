@@ -1,0 +1,35 @@
+[    1304ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=7151133e:15802
+[   26554ms] [ERROR] React has detected a change in the order of Hooks called by %s. This will lead to bugs and errors if not fixed. For more information, read the Rules of Hooks: https://react.dev/link/rules-of-hooks
+
+   Previous render            Next render
+   ------------------------------------------------------
+%s   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ AdminDashboard 1. useCallback                useCallback
+2. useSyncExternalStore       useSyncExternalStore
+3. useDebugValue              useDebugValue
+4. useContext                 useContext
+5. useContext                 useContext
+6. useContext                 useContext
+7. useEffect                  useEffect
+8. useState                   useState
+9. useCallback                useCallback
+10. useSyncExternalStore      useSyncExternalStore
+11. useEffect                 useEffect
+12. undefined                 useContext
+ @ http://localhost:5173/@vite/client:367
+[   26568ms] Error: Rendered more hooks than during the previous render.
+    at updateWorkInProgressHook (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=7151133e:4514:12)
+    at updateReducer (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=7151133e:4606:29)
+    at Object.useState (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=7151133e:14574:13)
+    at exports.useState (http://localhost:5173/node_modules/.vite/deps/react-4hkZzRew.js?v=7151133e:769:31)
+    at useMutation (http://localhost:5173/node_modules/.vite/deps/@tanstack_react-query.js?v=7151133e:5835:34)
+    at AdminDashboard (http://localhost:5173/src/pages/DashboardPage.tsx?t=1793273019386:762:19)
+    at Object.react_stack_bottom_frame (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=7151133e:14140:12)
+    at renderWithHooks (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=7151133e:4398:19)
+    at updateFunctionComponent (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=7151133e:5773:16)
+    at beginWork (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=7151133e:6389:20)
+[   26567ms] [WARNING] %s
+
+%s
+ An error occurred in the <AdminDashboard> component. Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries. @ http://localhost:5173/@vite/client:367

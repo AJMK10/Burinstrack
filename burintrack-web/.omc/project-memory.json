@@ -1,0 +1,414 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1793189953825,
+  "projectRoot": "C:\\Users\\burinfort\\Documents\\DOSSIER BURINFORT AO\\burintrack\\burintrack-web",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
+      {
+        "name": "TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "tsconfig.json"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "react",
+        "version": "19.3.1",
+        "category": "frontend"
+      },
+      {
+        "name": "react-dom",
+        "version": "19.3.1",
+        "category": "frontend"
+      },
+      {
+        "name": "@playwright/test",
+        "version": "1.64.1",
+        "category": "testing"
+      },
+      {
+        "name": "vite",
+        "version": "8.3.4",
+        "category": "build"
+      },
+      {
+        "name": "vitest",
+        "version": "5.0.5",
+        "category": "testing"
+      }
+    ],
+    "packageManager": "npm",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": "npm run build",
+    "testCommand": "npm test",
+    "lintCommand": "npm run lint",
+    "devCommand": "npm run dev",
+    "scripts": {
+      "dev": "vite",
+      "build": "tsc -b && vite build",
+      "lint": "oxlint",
+      "preview": "vite preview",
+      "test": "vitest run",
+      "test:watch": "vitest",
+      "test:coverage": "vitest run --coverage",
+      "test:e2e": "playwright test",
+      "test:e2e:ui": "playwright test --ui"
+    }
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": "type-based"
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "public",
+      "src"
+    ],
+    "gitBranches": null
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "dist": {
+      "path": "dist",
+      "purpose": "Distribution/build output",
+      "fileCount": 3,
+      "lastAccessed": 1793189953695,
+      "keyFiles": [
+        "favicon.svg",
+        "icons.svg",
+        "index.html"
+      ]
+    },
+    "e2e": {
+      "path": "e2e",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1793189953696,
+      "keyFiles": [
+        "login.spec.ts",
+        "navigation.spec.ts"
+      ]
+    },
+    "playwright-report": {
+      "path": "playwright-report",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1793189953709,
+      "keyFiles": [
+        "index.html"
+      ]
+    },
+    "public": {
+      "path": "public",
+      "purpose": "Public files",
+      "fileCount": 2,
+      "lastAccessed": 1793189953709,
+      "keyFiles": [
+        "favicon.svg",
+        "icons.svg"
+      ]
+    },
+    "src": {
+      "path": "src",
+      "purpose": "Source code",
+      "fileCount": 4,
+      "lastAccessed": 1793189953710,
+      "keyFiles": [
+        "App.css",
+        "App.tsx",
+        "index.css",
+        "main.tsx"
+      ]
+    },
+    "dist\\assets": {
+      "path": "dist\\assets",
+      "purpose": "Static assets",
+      "fileCount": 12,
+      "lastAccessed": 1793189953710,
+      "keyFiles": [
+        "index-B3DBGTan.js",
+        "index-DjR0dSDP.css",
+        "inter-cyrillic-ext-wght-normal-BOeWTOD4.woff2"
+      ]
+    },
+    "src\\assets": {
+      "path": "src\\assets",
+      "purpose": "Static assets",
+      "fileCount": 3,
+      "lastAccessed": 1793189953713,
+      "keyFiles": [
+        "hero.png",
+        "react.svg",
+        "vite.svg"
+      ]
+    },
+    "src\\components": {
+      "path": "src\\components",
+      "purpose": "UI components",
+      "fileCount": 3,
+      "lastAccessed": 1793189953713,
+      "keyFiles": [
+        "charts.tsx",
+        "Layout.tsx",
+        "ui.tsx"
+      ]
+    },
+    "src\\lib": {
+      "path": "src\\lib",
+      "purpose": "Library code",
+      "fileCount": 2,
+      "lastAccessed": 1793189953714,
+      "keyFiles": [
+        "api.ts",
+        "format.ts"
+      ]
+    },
+    "src\\pages": {
+      "path": "src\\pages",
+      "purpose": "Page components",
+      "fileCount": 9,
+      "lastAccessed": 1793189953714,
+      "keyFiles": [
+        "CartePage.tsx",
+        "ClientsPage.tsx",
+        "CompteursPage.tsx"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "src/styles/adminkit.scss",
+      "accessCount": 64,
+      "lastAccessed": 1793274167529,
+      "type": "file"
+    },
+    {
+      "path": "src/components/layout/AdminLayout.tsx",
+      "accessCount": 36,
+      "lastAccessed": 1793274650995,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/ClientsPage.tsx",
+      "accessCount": 28,
+      "lastAccessed": 1793204722577,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/CopieursPage.tsx",
+      "accessCount": 26,
+      "lastAccessed": 1793204733821,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/ParametresPage.tsx",
+      "accessCount": 25,
+      "lastAccessed": 1793274874877,
+      "type": "file"
+    },
+    {
+      "path": "src/components/ui.tsx",
+      "accessCount": 21,
+      "lastAccessed": 1793274563024,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/TechniciensPage.tsx",
+      "accessCount": 19,
+      "lastAccessed": 1793204780513,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/LoginPage.tsx",
+      "accessCount": 18,
+      "lastAccessed": 1793275453426,
+      "type": "file"
+    },
+    {
+      "path": "src/App.tsx",
+      "accessCount": 17,
+      "lastAccessed": 1793273947083,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/InterventionsPage.tsx",
+      "accessCount": 14,
+      "lastAccessed": 1793202509671,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/UsersPage.tsx",
+      "accessCount": 13,
+      "lastAccessed": 1793202660732,
+      "type": "file"
+    },
+    {
+      "path": "",
+      "accessCount": 12,
+      "lastAccessed": 1793202806817,
+      "type": "directory"
+    },
+    {
+      "path": "src/pages/CompteursPage.tsx",
+      "accessCount": 11,
+      "lastAccessed": 1793277105778,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/DashboardPage.tsx",
+      "accessCount": 9,
+      "lastAccessed": 1793274934025,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/ClientFormPage.tsx",
+      "accessCount": 8,
+      "lastAccessed": 1793266505836,
+      "type": "file"
+    },
+    {
+      "path": "src/types/index.ts",
+      "accessCount": 7,
+      "lastAccessed": 1793205088898,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/ProfilePage.tsx",
+      "accessCount": 6,
+      "lastAccessed": 1793201525293,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/AttributionFormPage.tsx",
+      "accessCount": 5,
+      "lastAccessed": 1793205224217,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/printFacture.ts",
+      "accessCount": 5,
+      "lastAccessed": 1793277701352,
+      "type": "file"
+    },
+    {
+      "path": "src/store/toastStore.ts",
+      "accessCount": 4,
+      "lastAccessed": 1793205198068,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/CopieurFormPage.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1793204918180,
+      "type": "file"
+    },
+    {
+      "path": "src",
+      "accessCount": 2,
+      "lastAccessed": 1793199863314,
+      "type": "directory"
+    },
+    {
+      "path": "src/components",
+      "accessCount": 2,
+      "lastAccessed": 1793205191329,
+      "type": "directory"
+    },
+    {
+      "path": "public/copier-hero.svg",
+      "accessCount": 2,
+      "lastAccessed": 1793275267338,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/RapportsPage.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1793189978948,
+      "type": "file"
+    },
+    {
+      "path": "src/store/authStore.ts",
+      "accessCount": 1,
+      "lastAccessed": 1793191194066,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/format.ts",
+      "accessCount": 1,
+      "lastAccessed": 1793197351578,
+      "type": "file"
+    },
+    {
+      "path": "src/pages",
+      "accessCount": 1,
+      "lastAccessed": 1793199462463,
+      "type": "directory"
+    },
+    {
+      "path": "src/pages/InterventionFormPage.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1793202174406,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/TechnicienFormPage.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1793202187244,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/UserFormPage.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1793202209054,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/api.ts",
+      "accessCount": 1,
+      "lastAccessed": 1793202814583,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/ClientDetailPage.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1793204206681,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/CopieurDetailPage.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1793204229469,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/TechnicienDetailPage.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1793204246672,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/AttributionPage.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1793205127606,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}

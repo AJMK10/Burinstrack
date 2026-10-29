@@ -1,0 +1,40 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - generic [ref=e7]:
+      - img [aria-hidden] [ref=e8]:
+        - generic [ref=e11]: BF
+      - generic [ref=e13]:
+        - generic [ref=e14]: BurinTrack
+        - generic [ref=e15]: par BURINFORT
+    - generic [ref=e16]:
+      - generic [ref=e17]: Plateforme SAV nouvelle génération
+      - heading "Pilotez votre parc de copieurs, sans friction." [level=1] [ref=e21]
+      - paragraph [ref=e22]: Une seule plateforme pour vos contrats, vos interventions techniques et le suivi des compteurs de plus de 200 machines.
+      - generic [ref=e23]:
+        - generic [ref=e28]:
+          - generic [ref=e29]: Interventions tracées
+          - generic [ref=e30]: Du signalement à la clôture, chaque action est historisée.
+        - generic [ref=e36]:
+          - generic [ref=e37]: Compteurs & facturation
+          - generic [ref=e38]: Volumes noir & blanc et couleur calculés automatiquement.
+        - generic [ref=e44]:
+          - generic [ref=e45]: Parc géolocalisé
+          - generic [ref=e46]: Visualisez vos clients et optimisez les déplacements.
+    - paragraph [ref=e47]: © 2026 BURINFORT · Service Technique / SAV
+  - generic [ref=e49]:
+    - heading "Bon retour 👋" [level=2] [ref=e50]
+    - paragraph [ref=e51]: Connectez-vous pour accéder à votre espace de gestion SAV.
+    - generic [ref=e52]:
+      - generic [ref=e53]:
+        - generic [ref=e54]: Adresse e-mail
+        - textbox "Adresse e-mail" [ref=e60]:
+          - /placeholder: nom@burinfort.com
+      - generic [ref=e61]:
+        - generic [ref=e62]: Mot de passe
+        - generic [ref=e63]:
+          - textbox "Mot de passe" [ref=e68]:
+            - /placeholder: ••••••••
+          - button "Afficher" [ref=e69] [cursor=pointer]
+      - button "Se connecter" [ref=e73] [cursor=pointer]
+    - button "Compte de démonstration" [ref=e74] [cursor=pointer]
+    - paragraph [ref=e78]: Application interne BURINFORT · Connexion sécurisée

@@ -26,5 +26,7 @@ Thumbs.db
 
 
 
-# Script de dev local (credentials)
+# Scripts de dev local (contiennent des credentials)
 start-dev.bat
+start-api.ps1
+start-api.bat

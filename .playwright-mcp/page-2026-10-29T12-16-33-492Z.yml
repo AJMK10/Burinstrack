@@ -1,0 +1,43 @@
+- generic [ref=f1e3]:
+  - generic [ref=f1e4]:
+    - generic [ref=f1e7]:
+      - img [aria-hidden] [ref=f1e8]:
+        - generic [ref=f1e11]: BF
+      - generic [ref=f1e13]:
+        - generic [ref=f1e14]: BurinTrack
+        - generic [ref=f1e15]: par BURINFORT
+    - generic [ref=f1e16]:
+      - generic [ref=f1e17]: Plateforme SAV nouvelle génération
+      - heading "Pilotez votre parc de copieurs, sans friction." [level=1] [ref=f1e21]
+      - paragraph [ref=f1e22]: Une seule plateforme pour vos contrats, vos interventions techniques et le suivi des compteurs de plus de 200 machines.
+      - generic [ref=f1e23]:
+        - generic [ref=f1e28]:
+          - generic [ref=f1e29]: Interventions tracées
+          - generic [ref=f1e30]: Du signalement à la clôture, chaque action est historisée.
+        - generic [ref=f1e36]:
+          - generic [ref=f1e37]: Compteurs & facturation
+          - generic [ref=f1e38]: Volumes noir & blanc et couleur calculés automatiquement.
+        - generic [ref=f1e44]:
+          - generic [ref=f1e45]: Parc géolocalisé
+          - generic [ref=f1e46]: Visualisez vos clients et optimisez les déplacements.
+    - paragraph [ref=f1e47]: © 2026 BURINFORT · Service Technique / SAV
+  - generic [ref=f1e49]:
+    - heading "Bon retour 👋" [level=2] [ref=f1e50]
+    - paragraph [ref=f1e51]: Connectez-vous pour accéder à votre espace de gestion SAV.
+    - generic [ref=f1e52]:
+      - generic [ref=f1e53]:
+        - generic [ref=f1e54]: Adresse e-mail
+        - textbox "Adresse e-mail" [ref=f1e60]:
+          - /placeholder: nom@burinfort.com
+          - text: admin@burinfort.com
+      - generic [ref=f1e61]:
+        - generic [ref=f1e62]: Mot de passe
+        - generic [ref=f1e63]:
+          - textbox "Mot de passe" [ref=f1e68]:
+            - /placeholder: ••••••••
+            - text: Admin@2026!
+          - button "Masquer" [ref=f1e79] [cursor=pointer]
+      - generic [ref=f1e85]: The field MotDePasse must be a string with a minimum length of 12 and a maximum length of 128.
+      - button "Se connecter" [ref=f1e73] [cursor=pointer]
+    - button "Compte de démonstration" [ref=f1e74] [cursor=pointer]
+    - paragraph [ref=f1e78]: Application interne BURINFORT · Connexion sécurisée

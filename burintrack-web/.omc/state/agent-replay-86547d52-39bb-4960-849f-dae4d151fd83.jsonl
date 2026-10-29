@@ -1,0 +1,4 @@
+{"t":0,"agent":"acd7662","agent_type":"fork","event":"agent_start","parent_mode":"none"}
+{"t":0,"agent":"a2f3b84","agent_type":"fork","event":"agent_stop","success":true,"duration_ms":431919}
+{"t":0,"agent":"acd7662","agent_type":"fork","event":"agent_stop","success":true,"duration_ms":553129}
+{"t":0,"agent":"a0abb76","agent_type":"untracked-native-fork","event":"agent_stop","success":true,"synthetic":true,"telemetry_status":"unmatched_stop","reason":"SubagentStop arrived without a matching SubagentStart; native Agent/Task start telemetry was not observed."}

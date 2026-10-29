@@ -1,0 +1,408 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1793271196097,
+  "projectRoot": "C:\\Users\\burinfort\\Documents\\DOSSIER BURINFORT AO\\burintrack",
+  "techStack": {
+    "languages": [],
+    "frameworks": [],
+    "packageManager": null,
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": null,
+    "testCommand": null,
+    "lintCommand": null,
+    "devCommand": null,
+    "scripts": {}
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "src",
+      "tests"
+    ],
+    "gitBranches": null
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "burintrack-web": {
+      "path": "burintrack-web",
+      "purpose": null,
+      "fileCount": 13,
+      "lastAccessed": 1793271196042,
+      "keyFiles": [
+        "Dockerfile",
+        "index.html",
+        "package-lock.json",
+        "package.json",
+        "playwright.config.ts"
+      ]
+    },
+    "docker": {
+      "path": "docker",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1793271196044,
+      "keyFiles": []
+    },
+    "SeedRunner": {
+      "path": "SeedRunner",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1793271196044,
+      "keyFiles": [
+        "Program.cs",
+        "SeedRunner.csproj"
+      ]
+    },
+    "src": {
+      "path": "src",
+      "purpose": "Source code",
+      "fileCount": 0,
+      "lastAccessed": 1793271196044,
+      "keyFiles": []
+    },
+    "tests": {
+      "path": "tests",
+      "purpose": "Test files",
+      "fileCount": 0,
+      "lastAccessed": 1793271196045,
+      "keyFiles": []
+    },
+    "burintrack-web\\dist": {
+      "path": "burintrack-web\\dist",
+      "purpose": "Distribution/build output",
+      "fileCount": 3,
+      "lastAccessed": 1793271196046,
+      "keyFiles": [
+        "favicon.svg",
+        "icons.svg",
+        "index.html"
+      ]
+    },
+    "burintrack-web\\node_modules": {
+      "path": "burintrack-web\\node_modules",
+      "purpose": "Dependencies",
+      "fileCount": 1,
+      "lastAccessed": 1793271196047,
+      "keyFiles": []
+    },
+    "SeedRunner\\bin": {
+      "path": "SeedRunner\\bin",
+      "purpose": "Executable scripts",
+      "fileCount": 0,
+      "lastAccessed": 1793271196048,
+      "keyFiles": []
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "burintrack-web/src/pages/DashboardPage.tsx",
+      "accessCount": 25,
+      "lastAccessed": 1793273019900,
+      "type": "file"
+    },
+    {
+      "path": "burintrack-web/src/styles/adminkit.scss",
+      "accessCount": 17,
+      "lastAccessed": 1793199229649,
+      "type": "file"
+    },
+    {
+      "path": "burintrack-web/src/components/layout/AdminLayout.tsx",
+      "accessCount": 17,
+      "lastAccessed": 1793272053117,
+      "type": "file"
+    },
+    {
+      "path": "burintrack-web/src/pages/CompteursPage.tsx",
+      "accessCount": 15,
+      "lastAccessed": 1793276831522,
+      "type": "file"
+    },
+    {
+      "path": "docker-compose.yml",
+      "accessCount": 13,
+      "lastAccessed": 1793187849255,
+      "type": "file"
+    },
+    {
+      "path": "burintrack-web/src/types/index.ts",
+      "accessCount": 11,
+      "lastAccessed": 1793276610240,
+      "type": "directory"
+    },
+    {
+      "path": "burintrack-web/src/pages/InterventionsPage.tsx",
+      "accessCount": 10,
+      "lastAccessed": 1793190452681,
+      "type": "file"
+    },
+    {
+      "path": "burintrack-web/src/App.tsx",
+      "accessCount": 10,
+      "lastAccessed": 1793271408340,
+      "type": "file"
+    },
+    {
+      "path": "burintrack-web/src/pages/CopieursPage.tsx",
+      "accessCount": 9,
+      "lastAccessed": 1793190477313,
+      "type": "directory"
+    },
+    {
+      "path": "burintrack-web/src/pages/ClientsPage.tsx",
+      "accessCount": 9,
+      "lastAccessed": 1793265106482,
+      "type": "file"
+    },
+    {
+      "path": "burintrack-web/src/components/charts.tsx",
+      "accessCount": 8,
+      "lastAccessed": 1793190488035,
+      "type": "file"
+    },
+    {
+      "path": "burintrack-web/src/pages/LoginPage.tsx",
+      "accessCount": 7,
+      "lastAccessed": 1793276216367,
+      "type": "file"
+    },
+    {
+      "path": "burintrack-web/src/components/ui.tsx",
+      "accessCount": 6,
+      "lastAccessed": 1793190470283,
+      "type": "file"
+    },
+    {
+      "path": "start-api.bat",
+      "accessCount": 6,
+      "lastAccessed": 1793207953797,
+      "type": "file"
+    },
+    {
+      "path": "burintrack-web/src/lib/format.ts",
+      "accessCount": 6,
+      "lastAccessed": 1793270451356,
+      "type": "file"
+    },
+    {
+      "path": "src/BurinTrack.Infrastructure/DependencyInjection.cs",
+      "accessCount": 6,
+      "lastAccessed": 1793271004744,
+      "type": "file"
+    },
+    {
+      "path": "burintrack-web/src/components/Layout.tsx",
+      "accessCount": 6,
+      "lastAccessed": 1793271480085,
+      "type": "file"
+    },
+    {
+      "path": "burintrack-web",
+      "accessCount": 5,
+      "lastAccessed": 1793188565244,
+      "type": "directory"
+    },
+    {
+      "path": "src/BurinTrack.API/Controllers/DashboardController.cs",
+      "accessCount": 5,
+      "lastAccessed": 1793272963459,
+      "type": "file"
+    },
+    {
+      "path": "src/BurinTrack.API/appsettings.json",
+      "accessCount": 5,
+      "lastAccessed": 1793276133428,
+      "type": "file"
+    },
+    {
+      "path": "burintrack-web/e2e/login.spec.ts",
+      "accessCount": 4,
+      "lastAccessed": 1793184844496,
+      "type": "file"
+    },
+    {
+      "path": "burintrack-web/e2e/navigation.spec.ts",
+      "accessCount": 4,
+      "lastAccessed": 1793184849630,
+      "type": "file"
+    },
+    {
+      "path": "burintrack-web/playwright.config.ts",
+      "accessCount": 4,
+      "lastAccessed": 1793186579790,
+      "type": "file"
+    },
+    {
+      "path": "burintrack-web/src/pages/CartePage.tsx",
+      "accessCount": 4,
+      "lastAccessed": 1793189132800,
+      "type": "file"
+    },
+    {
+      "path": "burintrack-web/src",
+      "accessCount": 4,
+      "lastAccessed": 1793190491150,
+      "type": "directory"
+    },
+    {
+      "path": "",
+      "accessCount": 4,
+      "lastAccessed": 1793206345121,
+      "type": "directory"
+    },
+    {
+      "path": "start-dev.bat",
+      "accessCount": 4,
+      "lastAccessed": 1793268920520,
+      "type": "file"
+    },
+    {
+      "path": "burintrack-web/src/lib/api.ts",
+      "accessCount": 4,
+      "lastAccessed": 1793270730794,
+      "type": "file"
+    },
+    {
+      "path": "burintrack-web/src/pages/TechniciensPage.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1793189032081,
+      "type": "file"
+    },
+    {
+      "path": "burintrack-web/src/index.css",
+      "accessCount": 3,
+      "lastAccessed": 1793189688025,
+      "type": "file"
+    },
+    {
+      "path": "burintrack-web/src/pages/RapportsPage.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1793190424308,
+      "type": "file"
+    },
+    {
+      "path": "src/BurinTrack.API/Program.cs",
+      "accessCount": 3,
+      "lastAccessed": 1793206137761,
+      "type": "file"
+    },
+    {
+      "path": "burintrack-web/src/store/authStore.ts",
+      "accessCount": 3,
+      "lastAccessed": 1793270730855,
+      "type": "file"
+    },
+    {
+      "path": ".env",
+      "accessCount": 2,
+      "lastAccessed": 1793184015565,
+      "type": "file"
+    },
+    {
+      "path": "docker/nginx/nginx.conf",
+      "accessCount": 2,
+      "lastAccessed": 1793186088607,
+      "type": "file"
+    },
+    {
+      "path": "burintrack-web/src/main.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1793188716263,
+      "type": "file"
+    },
+    {
+      "path": "burintrack-web/vite.config.ts",
+      "accessCount": 2,
+      "lastAccessed": 1793189577524,
+      "type": "file"
+    },
+    {
+      "path": "src/BurinTrack.API/Extensions/DatabaseSeeder.cs",
+      "accessCount": 2,
+      "lastAccessed": 1793206129524,
+      "type": "file"
+    },
+    {
+      "path": "src/BurinTrack.API/Controllers/TechniciensController.cs",
+      "accessCount": 2,
+      "lastAccessed": 1793270111311,
+      "type": "file"
+    },
+    {
+      "path": "src/BurinTrack.Application/Interfaces/IStorageService.cs",
+      "accessCount": 1,
+      "lastAccessed": 1793184018563,
+      "type": "file"
+    },
+    {
+      "path": "src/BurinTrack.Infrastructure/Services/MinioStorageService.cs",
+      "accessCount": 1,
+      "lastAccessed": 1793184029347,
+      "type": "file"
+    },
+    {
+      "path": "burintrack-web/test-results/login-Page-de-connexion-affiche-le-formulaire-de-connexion-chromium/error-context.md",
+      "accessCount": 1,
+      "lastAccessed": 1793184523335,
+      "type": "file"
+    },
+    {
+      "path": "src/BurinTrack.API/appsettings.Development.json",
+      "accessCount": 1,
+      "lastAccessed": 1793187835235,
+      "type": "file"
+    },
+    {
+      "path": "burintrack-web/package.json",
+      "accessCount": 1,
+      "lastAccessed": 1793188535629,
+      "type": "file"
+    },
+    {
+      "path": "burintrack-web/tailwind.config.js",
+      "accessCount": 1,
+      "lastAccessed": 1793188563993,
+      "type": "file"
+    },
+    {
+      "path": "burintrack-web/src/store/toastStore.ts",
+      "accessCount": 1,
+      "lastAccessed": 1793188565142,
+      "type": "file"
+    },
+    {
+      "path": "burintrack-web/src/App.css",
+      "accessCount": 1,
+      "lastAccessed": 1793189588440,
+      "type": "file"
+    },
+    {
+      "path": "burintrack-web/public/favicon.svg",
+      "accessCount": 1,
+      "lastAccessed": 1793189610202,
+      "type": "file"
+    },
+    {
+      "path": "src/BurinTrack.API/Controllers/RapportsController.cs",
+      "accessCount": 1,
+      "lastAccessed": 1793190163999,
+      "type": "file"
+    },
+    {
+      "path": "burintrack-web/src/lib",
+      "accessCount": 1,
+      "lastAccessed": 1793190357943,
+      "type": "directory"
+    }
+  ],
+  "userDirectives": []
+}

@@ -1,0 +1,58 @@
+- generic [ref=f3e3]:
+  - navigation [ref=f3e4]:
+    - link "BurinTrack par BURINFORT" [ref=f3e5] [cursor=pointer]:
+      - /url: /
+      - img [aria-hidden] [ref=f3e6]:
+        - generic [ref=f3e9]: BF
+      - generic [ref=f3e11]:
+        - generic [ref=f3e12]: BurinTrack
+        - generic [ref=f3e13]: par BURINFORT
+    - list [ref=f3e14]:
+      - listitem [ref=f3e15]:
+        - generic [ref=f3e16]: Pilotage
+        - link "Tableau de bord" [ref=f3e18] [cursor=pointer]:
+          - /url: /
+        - link "Carte des clients" [ref=f3e26] [cursor=pointer]:
+          - /url: /carte
+        - link "Rapports" [ref=f3e31] [cursor=pointer]:
+          - /url: /rapports
+      - listitem [ref=f3e34]:
+        - generic [ref=f3e35]: Gestion
+        - link "Clients" [ref=f3e37] [cursor=pointer]:
+          - /url: /clients
+        - link "Parc copieurs" [ref=f3e45] [cursor=pointer]:
+          - /url: /copieurs
+        - link "Attributions" [ref=f3e52] [cursor=pointer]:
+          - /url: /attributions
+        - link "Interventions" [ref=f3e58] [cursor=pointer]:
+          - /url: /interventions
+        - link "Compteurs" [ref=f3e63] [cursor=pointer]:
+          - /url: /compteurs
+      - listitem [ref=f3e67]:
+        - generic [ref=f3e68]: Administration
+        - link "Utilisateurs" [ref=f3e70] [cursor=pointer]:
+          - /url: /utilisateurs
+        - link "Paramètres" [ref=f3e77] [cursor=pointer]:
+          - /url: /parametres
+    - generic [ref=f3e82]:
+      - generic [ref=f3e83]:
+        - generic [aria-hidden] [ref=f3e84]: A
+        - generic [ref=f3e85]:
+          - generic [ref=f3e86]: AHOULOU
+          - generic [ref=f3e87]: Administrateur
+      - button "Se déconnecter" [ref=f3e88] [cursor=pointer]
+  - generic [ref=f3e93]:
+    - banner [ref=f3e94]:
+      - generic [ref=f3e95]:
+        - button "Menu" [ref=f3e96] [cursor=pointer]
+        - generic [ref=f3e98]:
+          - paragraph [ref=f3e99]: Paramètres de l'application
+          - paragraph [ref=f3e100]: jeudi 29 octobre
+      - generic [ref=f3e101]:
+        - button "Notifications" [ref=f3e103] [cursor=pointer]
+        - button "AHOULOU Administrateur" [ref=f3e109] [cursor=pointer]:
+          - generic [aria-hidden] [ref=f3e110]: A
+          - generic [ref=f3e111]:
+            - generic [ref=f3e112]: AHOULOU
+            - generic [ref=f3e113]: Administrateur
+    - main [ref=f3e116]
