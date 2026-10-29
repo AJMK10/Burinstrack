@@ -23,8 +23,9 @@ public static class DatabaseSeeder
                 await roleManager.CreateAsync(new IdentityRole(role));
         }
 
-        // Créer l'admin par défaut si aucun utilisateur n'existe
-        if (!userManager.Users.Any())
+        // Créer l'admin par défaut s'il n'existe pas encore
+        var existing = await userManager.FindByEmailAsync("admin@burinfort.com");
+        if (existing == null)
         {
             var adminPassword = Environment.GetEnvironmentVariable("ADMIN_INITIAL_PASSWORD")
                 ?? throw new InvalidOperationException(
